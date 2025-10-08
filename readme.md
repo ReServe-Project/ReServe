@@ -79,8 +79,7 @@ IV. User Roles
         - View real-time insights showing the number of users viewing the class and those who have already booked it.
 
 V. Links
-    PWS Deployment:
-    https://pbp.cs.ui.ac.id/web/project/khayru.rafa/reserve
-
-    Design:
-    https://www.figma.com/team_invite/redeem/ofrpzmgVMDOn9n8CVpSdHt 
+    - PWS Deployment:
+        https://pbp.cs.ui.ac.id/web/project/khayru.rafa/reserve
+    - Design:
+        https://www.figma.com/team_invite/redeem/ofrpzmgVMDOn9n8CVpSdHt 
