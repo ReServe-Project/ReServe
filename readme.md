@@ -9,10 +9,15 @@ Group member names
 I. Application Description
 
 Tired of the same workout routine? Meet ReServe, the app that helps you move, sweat, and explore fitness your way!
+
 ReServe is a smart class booking app designed to make joining fitness sessions simple, fast, and stress-free. With fitness classes like Pilates, Yoga, and Boxing becoming increasingly popular, spots can fill up within minutes. ReServe solves this problem by giving users real-time access to available classes and studios, allowing them to easily find and reserve sessions anytime, anywhere.
+
 The app covers a wide range of fitness experiences from Pilates and Yoga for mindful movement, to Dance and Muay Thai for high-energy workouts, and even Shooting Range for those who enjoy focus and precision. Whether it’s your first class or part of your weekly routine, ReServe ensures you spend less time worrying about availability and more time improving your well-being.
+
 For members, ReServe offers convenience, flexibility, and control. You can browse nearby studios, explore class types, view live schedules, and book instantly. Say goodbye to waiting lists and confusing sign-ups. With ReServe, you can seamlessly manage all your bookings, track upcoming sessions, and discover new ways to stay active all in one website.
+
 For instructors, ReServe provides a smarter system to manage class reservations. It streamlines the entire process from tracking attendance and updating schedules to optimizing class capacity. This means smoother operations, happier clients, and more time to focus on what matters most: delivering great fitness experiences.
+
 Ultimately, ReServe connects people with the classes they love, making fitness more accessible, organized, and inspiring for everyone.
 
 
