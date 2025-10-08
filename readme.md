@@ -38,12 +38,12 @@ The login page is responsible for verifying user information and ensuring secure
 The user profile page displays user information such as profile picture, display name and username handle. It serves as identification for each user in the website. Users can also edit and update their profile details, allowing them to keep their information accurate.
 
 
-5. Landing Page/Home (Khayru)
+5. Landing Page/Home (Shelia)
 
 Serves as the entry point for ReServe, introducing the overall app and seamlessly connects with other modules such as login/register, user profile, search, facility details and history to provide a smooth experience for discovering and reserving sports facilities.
 
 
-6. Search Page (Shelia)
+6. Search Page (Khayru)
 
 Users can easily search, discover, and explore available classes with ReServe’s intuitive search feature. Two dedicated search bars make it simple, one to filter by category and another by location. This helps users find the perfect class anytime and anywhere. By default, classes are sorted by the nearest date, but users can also sort results by price or popularity to match their preferences.
 
