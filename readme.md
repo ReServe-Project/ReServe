@@ -18,47 +18,47 @@ Ultimately, ReServe connects people with the classes they love, making fitness m
 
 II. List of Modules
 
-Main (All):
+1. Main (All):
 
 This module provides the configuration settings and data required for the database seeding process, ensuring that initial or sample data is properly inserted into the system for testing, development, or setup purposes.
 
 
-Registration Page (All):
+2. Registration Page (All):
 
 The registration page lets users create their own account quickly and securely. When all required fields meet the validation rules, users are directed to the Login page to access their account.
 
 
-Login (All):
+3. Login (All):
 
 The login page is responsible for verifying user information and ensuring secure access. Only authenticated users are allowed to book classes. Unregistered visitors must create an account and log in before making a reservation.
 
 
-User Profile (Alifa): 
+4. User Profile (Alifa): 
 
 The user profile page displays user information such as profile picture, display name and username handle. It serves as identification for each user in the website. Users can also edit and update their profile details, allowing them to keep their information accurate.
 
 
-Landing Page/Home (Khayru)
+5. Landing Page/Home (Khayru)
 
 Serves as the entry point for ReServe, introducing the overall app and seamlessly connects with other modules such as login/register, user profile, search, facility details and history to provide a smooth experience for discovering and reserving sports facilities.
 
 
-Search Page (Shelia)
+6. Search Page (Shelia)
 
 Users can easily search, discover, and explore available classes with ReServe’s intuitive search feature. Two dedicated search bars make it simple, one to filter by category and another by location. This helps users find the perfect class anytime and anywhere. By default, classes are sorted by the nearest date, but users can also sort results by price or popularity to match their preferences.
 
 
-Product Details (Juan):
+7. Product Details (Juan):
 
 Displays complete information for a selected class (category, class name, instructor, date & time, price, description, and picture), with a single Book action that proceeds to the Checkout page.
 
 
-History (Evelyn):
+8. History (Evelyn):
 
 The History feature lets users easily view and manage their past, current, and upcoming class reservations. Users can filter by booking type (upcoming, completed, cancelled) and the “Read More” button that is connected to the Product Details of the class the user booked.
 
 
-Checkout Page (Maharani) : 
+9. Checkout Page (Maharani) : 
 
 The checkout page lets users fill in their booking details, such as participant information and payment method, before confirming their sports session.
 
@@ -77,14 +77,17 @@ The dataset includes several popular class categories offered through ReServe. T
 
 Through this structured dataset, ReServe ensures that all class-related data is systematically organized and easily retrievable. It helps maintain smooth functionality across the app, from displaying class listings on the search page to handling bookings, cancellations, and user reviews. This makes the dataset a crucial component in supporting ReServe’s mission to provide a seamless and enjoyable fitness booking experience for users (members) and instructors alike.
 
+ReServe Dataset Link:
+https://docs.google.com/spreadsheets/d/1-QbXl7YVeG_cRdmo75v3SZpMip6Rkg6Ryo4JfBy-b_I/edit?usp=drivesdk
+
 Sources:
-ClassPass
-YogaFit
-DanceLifeX
-Superprof
-Fithub
-SigSauerAcademy
-StrongBee 
+ClassPass - https://classpass.com/
+YogaFit - https://www.yogafitid.com/class
+DanceLifeX - https://www.dancelifex.id/class
+Superprof - https://www.superprof.co.id/kursus/muay-thai/indonesia/
+Fithub - https://fithub.id/class
+SigSauerAcademy - https://sigsaueracademy.com/beginner-courses
+StrongBee - https://strongbee.co.id/home/classes?search=&location=
 
 
 IV. User Roles
