@@ -86,12 +86,19 @@ ReServe Dataset Link:
 https://docs.google.com/spreadsheets/d/1-QbXl7YVeG_cRdmo75v3SZpMip6Rkg6Ryo4JfBy-b_I/edit?usp=drivesdk
 
 Sources:
+
 ClassPass - https://classpass.com/
+
 YogaFit - https://www.yogafitid.com/class
+
 DanceLifeX - https://www.dancelifex.id/class
+
 Superprof - https://www.superprof.co.id/kursus/muay-thai/indonesia/
+
 Fithub - https://fithub.id/class
+
 SigSauerAcademy - https://sigsaueracademy.com/beginner-courses
+
 StrongBee - https://strongbee.co.id/home/classes?search=&location=
 
 
