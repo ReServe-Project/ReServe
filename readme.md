@@ -38,34 +38,34 @@ The registration page lets users create their own account quickly and securely. 
 The login page is responsible for verifying user information and ensuring secure access. Only authenticated users are allowed to book classes. Unregistered visitors must create an account and log in before making a reservation.
 
 
-4. User Profile (Alifa): 
+4. User Profile (Juan): 
 
 The user profile page displays user information such as profile picture, display name and username handle. It serves as identification for each user in the website. Users can also edit and update their profile details, allowing them to keep their information accurate.
 
 
-5. Landing Page/Home (Shelia)
+5. Landing Page/Home & Search (Maharani)
 
-Serves as the entry point for ReServe, introducing the overall app and seamlessly connects with other modules such as login/register, user profile, search, facility details and history to provide a smooth experience for discovering and reserving sports facilities.
-
-
-6. Search Page (Khayru)
-
-Users can easily search, discover, and explore available classes with ReServe’s intuitive search feature. Two dedicated search bars make it simple, one to filter by category and another by location. This helps users find the perfect class anytime and anywhere. By default, classes are sorted by the nearest date, but users can also sort results by price or popularity to match their preferences.
+Serves as the central entry point for ReServe, introducing the app and immediately empowering users to discover and reserve sports facilities through its intuitive search feature. Users can easily explore available classes using two dedicated search bars to filter by category (like yoga, pilates, or boxing). By default, results are sorted by the nearest date, but users can also sort by price or popularity to find the perfect class anytime, anywhere. This homepage seamlessly connects with all other modules, such as user profiles, facility details, and history, to provide a smooth and integrated experience from discovery to reservation.
 
 
-7. Product Details (Juan):
+6. Blog (Shelia)
+
+The Blog module serves as ReServe's fitness and wellness hub, where users can read and discover valuable content. It features articles, tutorials for classes like yoga and boxing, healthy living tips, and community stories. This space supports users beyond bookings, providing knowledge to help them learn, stay motivated, and get the most out of their wellness journey.
+
+
+7. Product Details (Alifa):
 
 Displays complete information for a selected class (category, class name, instructor, date & time, price, description, and picture), with a single Book action that proceeds to the Checkout page.
 
 
-8. History (Evelyn):
+8. Personal Goals (Khayru):
 
-The History feature lets users easily view and manage their past, current, and upcoming class reservations. Users can filter by booking type (upcoming, completed, cancelled) and the “Read More” button that is connected to the Product Details of the class the user booked.
+The Personal Goals module is a personal tracker where users can set and manage their fitness objectives. Users can create a new goal by clicking a date on the calendar, read all their previously made goals, and update a goal's status by clicking a checkbox to visually cross it out as complete.
 
 
-9. Checkout Page (Maharani) : 
+9. Checkout Page & History (Evelyn) : 
 
-The checkout page lets users fill in their booking details, such as participant information and payment method, before confirming their sports session.
+The checkout page lets users fill in their booking details, such as participant information and payment method, before confirming their sports session. Once a booking is complete, the History feature allows users to easily view and manage all their past, current, and upcoming class reservations. Within the History module, users can filter by booking type (upcoming, completed, cancelled) and use the “Read More” button to revisit the Product Details of any class they booked.
 
 
 III. Main Product Category Dataset Source
@@ -117,6 +117,6 @@ IV. User Roles
 
 V. Links
 - PWS Deployment:
-        https://pbp.cs.ui.ac.id/web/project/khayru.rafa/reserve
+        https://khayru-rafa-reserve.pbp.cs.ui.ac.id
 - Design:
         https://www.figma.com/team_invite/redeem/ofrpzmgVMDOn9n8CVpSdHt 
