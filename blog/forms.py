@@ -1,11 +1,7 @@
-from django import forms
-from .models import Blogs
+from django.forms import ModelForm
+from blog.models import Blog
 
-class BlogForm(forms.ModelForm):
+class BlogForm(ModelForm):
     class Meta:
-        model = Blogs
-        fields = ['title', 'date_blog', 'description', 'thumbnail']
-        widgets = {
-            'date_blog': forms.DateInput(attrs={'type': 'date'}),
-            'description': forms.Textarea(attrs={'rows': 5}),
-        }
+        model = Blog
+        fields = ["title", "content", "thumbnail"]  
