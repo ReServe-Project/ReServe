@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block meta %}
+<title>My Profile • ReServe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'accounts/css/profile.css' %}">
+{% endblock meta %}
+
+{% block content %}
+<div class="container-narrow">
+  <div class="card">
+    <div class="profile-header">
+      <div class="avatar-wrap">
+        <img src="{{ user.avatar.url|default:'/static/accounts/img/avatar-placeholder.png' }}" alt="Avatar">
+      </div>
+      <div>
+        <div class="name-row">
+          <h1 class="display-name">{{ user.display_name|default:user.username }}</h1>
+          {% if user.handle %}<span class="handle">@{{ user.handle }}</span>{% endif %}
+          {% if user.get_role_display %}<span class="role-chip">{{ user.get_role_display }}</span>{% endif %}
+        </div>
+        <div class="meta">
+          <div class="item">Email: <strong>{{ user.email|default:"—" }}</strong></div>
+          <span class="dot"></span>
+          <div class="item">Phone: <strong>{{ user.phone|default:"—" }}</strong></div>
+          <span class="dot"></span>
+          <div class="item">Location: <strong>{{ user.location|default:"—" }}</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="label">Height</div>
+        <div class="value">{{ user.height_cm|default:"—" }}<span class="text-muted"> cm</span></div>
+      </div>
+      <div class="metric">
+        <div class="label">Weight</div>
+        <div class="value">{{ user.weight_kg|default:"—" }}<span class="text-muted"> kg</span></div>
+      </div>
+      <div class="metric">
+        <div class="label">Last Login</div>
+        <div class="value">{{ user.last_login|date:"M d, Y" }}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>About</h3>
+      <p>{{ user.bio|default:"No bio yet." }}</p>
+      <div class="mt-3">
+        <a class="btn btn-primary" href="{% url 'profile_edit' %}">Edit Profile</a>
+        {% if user.handle %}
+        <a class="btn btn-outline" href="{% url 'public_profile' handle=user.handle %}">View Public Profile</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'accounts/js/profile.js' %}"></script>
+{% endblock content %}
