@@ -22,6 +22,7 @@ class ClassDetails(models.Model):
     location = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=0)
     description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='class_images/', null=True, blank=True)
     
     def get_schedule_display(self):
         if self.is_by_appointment:
@@ -45,9 +46,12 @@ class ClassDetails(models.Model):
 class Review(models.Model):
     class_details = models.ForeignKey(ClassDetails, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='class_reviews')
-    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)])  # 1-3 stars
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)])
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['class_details', 'user']
     
     def __str__(self):
         return f"Review #{self.id}"

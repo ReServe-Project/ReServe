@@ -1,0 +1,93 @@
+<!-- Rating Summary -->
+<div class="text-center mb-4 p-3 bg-light rounded">
+    <h5>Class Rating</h5>
+    <div class="mb-2">
+        {% with avg_rating=class_details.average_rating %}
+        {% for i in "123" %}
+            {% if forloop.counter <= avg_rating %}
+            ★
+            {% else %}
+            ☆
+            {% endif %}
+        {% endfor %}
+        <strong>{{ class_details.average_rating }}/3</strong>
+        {% endwith %}
+    </div>
+    <small class="text-muted">Based on {{ class_details.review_count }} reviews</small>
+</div>
+
+<!-- Add Review Button -->
+{% if can_review %}
+<div class="text-center mb-4">
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reviewModal">
+        Write a Review
+    </button>
+</div>
+{% elif user_review %}
+<div class="mb-4 p-3 border rounded bg-light">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0">Your Review</h6>
+        <div>
+            <button type="button" class="btn btn-sm btn-outline-primary" 
+                    data-bs-toggle="modal" data-bs-target="#editReviewModal">
+                Edit
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger delete-review-btn" 
+                    data-review-id="{{ user_review.id }}">
+                Delete
+            </button>
+        </div>
+    </div>
+    <div class="mt-2">
+        <strong>Your Rating:</strong> 
+        {% for i in "123" %}
+            {% if forloop.counter <= user_review.rating %}
+            ★
+            {% else %}
+            ☆
+            {% endif %}
+        {% endfor %}
+        <p class="mt-2 mb-1">{{ user_review.comment }}</p>
+        <small class="text-muted">Posted on: {{ user_review.created_at|date:"M d, Y" }}</small>
+    </div>
+</div>
+{% elif not request.user.is_authenticated %}
+<p class="text-center"><a href="{% url 'login' %}?next={{ request.path }}">Login to write a review</a></p>
+{% endif %}
+
+<!-- Reviews List with Horizontal Scroll -->
+<div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">All Reviews</h6>
+        {% if reviews.count > 2 %}
+        <small class="text-muted">Scroll → to see more reviews</small>
+        {% endif %}
+    </div>
+    
+    {% if reviews %}
+    <div class="reviews-scroll-container" style="overflow-x: auto; white-space: nowrap; padding-bottom: 15px; scrollbar-width: thin;">
+        <div class="d-flex" style="gap: 20px;">
+            {% for review in reviews %}
+            <div class="border rounded p-3" style="min-width: 280px; display: inline-block; white-space: normal; vertical-align: top;">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong class="text-truncate" style="max-width: 120px;">{{ review.user.display_name }}</strong>
+                    <span class="text-warning">
+                        {% for i in "123" %}
+                            {% if forloop.counter <= review.rating %}
+                            ★
+                            {% else %}
+                            ☆
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                </div>
+                <p class="mb-2" style="min-height: 80px; font-size: 0.9rem;">{{ review.comment }}</p>
+                <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <p class="text-center text-muted">No reviews yet. Be the first to review!</p>
+    {% endif %}
+</div>
