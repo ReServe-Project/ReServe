@@ -5,7 +5,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
 
-
 # --- Validators --------------------------------------------------------------
 
 HANDLE_REGEX = r"^[a-z0-9_.]{3,20}$"
@@ -27,63 +26,57 @@ def validate_birthdate_not_future(value):
 
 # --- Utilities ---------------------------------------------------------------
 
-def _unique_handle_for(base: str, max_len: int = 30) -> str:
+def _unique_handle_for(base: str, max_len: int = 30, instance_pk=None) -> str:
     """
-    Generate a unique slug/handle from a base string within max_len.
-    Appends -2, -3, ... if needed.
+    Build a unique handle from base, truncated to max_len, using _N suffix if needed.
     """
-    from django.contrib.auth import get_user_model
-
-    base_slug = slugify(base)[:max_len] or "user"
-    User = get_user_model()
-
-    # If available, use it
-    if not User.objects.filter(handle=base_slug).exists():
-        return base_slug
-
-    # Else append a counter
-    i = 2
-    while True:
-        candidate = f"{base_slug[: max_len - (len(str(i)) + 1)]}-{i}"
-        if not User.objects.filter(handle=candidate).exists():
-            return candidate
+    root = slugify(base or "user").replace("-", "_")
+    root = root[:max_len] or "user"
+    handle = root
+    i = 1
+    # Late reference to User is fine; function is called after class definition exists.
+    while User.objects.filter(handle=handle).exclude(pk=instance_pk).exists():
+        suffix = f"_{i}"
+        handle = f"{root[: max_len - len(suffix)]}{suffix}"
         i += 1
+    return handle
 
 
-# --- Custom User -------------------------------------------------------------
+# --- Model -------------------------------------------------------------------
 
 class User(AbstractUser):
-    MEMBER = "member"
-    INSTRUCTOR = "instructor"
-    ROLE_CHOICES = (
-        (MEMBER, "Member"),
-        (INSTRUCTOR, "Instructor"),
-    )
+    ROLE_CHOICES = [('member', 'Member'), ('instructor', 'Instructor')]
 
-    # Extra profile fields
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=MEMBER)
-    display_name = models.CharField(max_length=50, blank=True, help_text="Public display name.")
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='member')
+    display_name = models.CharField(max_length=50)
     handle = models.SlugField(
         max_length=30,
         unique=True,
-        help_text="Unique handle used in profile URLs, e.g., @john_doe",
-        validators=[handle_validator],
+        help_text="3–20 chars: a–z, 0–9, underscore, dot",
     )
     bio = models.TextField(blank=True)
     gender = models.CharField(max_length=10, blank=True)
-    phone = models.CharField(max_length=20, blank=True, validators=[phone_validator])
-    birthdate = models.DateField(null=True, blank=True, validators=[validate_birthdate_not_future])
+    phone = models.CharField(max_length=20, blank=True)
+    birthdate = models.DateField(null=True, blank=True)
     location = models.CharField(max_length=100, blank=True)
-    avatar = models.ImageField(
-        upload_to="avatars/",
-        blank=True,
-        default="avatars/default.png",
-        help_text="JPEG/PNG/WebP up to ~2MB.",
+    avatar = models.ImageField(upload_to='avatars/', blank=True, default='avatars/default.png')
+
+    # NEW: physical attributes
+    height_cm = models.PositiveSmallIntegerField(
+        null=True, blank=True, help_text="User height in centimeters (80–250)."
     )
+    weight_kg = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True,
+        help_text="User weight in kilograms (25.00–300.00)."
+    )
+
+    # validators (kept for reference/usage)
+    handle_validator = RegexValidator(regex=HANDLE_REGEX, message="Handle must be 3–20 chars (a–z, 0–9, _ or .)")
+    phone_validator = phone_validator
 
     def clean(self):
         super().clean()
-        # Re-run validators explicitly for safety when saving via admin/forms
+        # existing validators you already had...
         if self.handle:
             handle_validator(self.handle)
         if self.phone:
@@ -91,18 +84,22 @@ class User(AbstractUser):
         if self.birthdate:
             validate_birthdate_not_future(self.birthdate)
 
-    def save(self, *args, **kwargs):
-        # Auto-populate display_name if empty
-        if not self.display_name:
-            self.display_name = self.get_full_name().strip() or self.username
+        # NEW: sanity ranges (only if provided)
+        if self.height_cm is not None:
+            if not (80 <= self.height_cm <= 250):
+                raise ValidationError({"height_cm": "Height must be between 80 and 250 cm."})
 
-        # If no handle set, generate a unique one from display_name/username
+        if self.weight_kg is not None:
+            # Convert Decimal to float safely for comparison
+            w = float(self.weight_kg)
+            if not (25.0 <= w <= 300.0):
+                raise ValidationError({"weight_kg": "Weight must be between 25 and 300 kg."})
+
+    def save(self, *args, **kwargs):
         if not self.handle:
             base = self.display_name or self.username or "user"
-            self.handle = _unique_handle_for(base, max_len=30)
-
+            self.handle = _unique_handle_for(base, max_len=30, instance_pk=self.pk)
         super().save(*args, **kwargs)
 
-    def __str__(self) -> str:
-        dn = self.display_name or self.username
-        return f"{dn} (@{self.handle})"
+    def __str__(self):
+        return f"{self.display_name or self.username} (@{self.handle})"

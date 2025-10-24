@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.utils import timezone
-
+from django.contrib.auth.forms import UserCreationForm
 
 User = get_user_model()
 
@@ -29,20 +29,27 @@ ALLOWED_IMAGE_EXTS = {"jpg", "jpeg", "png", "webp"}
 # --- Forms ------------------------------------------------------------------------
 
 class ProfileEditForm(forms.ModelForm):
-    """
-    For editing the **owner's** profile fields (non-credential stuff).
-    Intentionally excludes username/email/password/handle; handle edit is a separate flow.
-    """
     class Meta:
         model = User
-        fields = ["display_name", "bio", "gender", "phone", "birthdate", "location"]
+        fields = [
+            "display_name",
+            "bio",
+            "gender",
+            "phone",
+            "birthdate",
+            "location",
+            # NEW:
+            "height_cm",
+            "weight_kg",
+        ]
         widgets = {
             "birthdate": forms.DateInput(attrs={"type": "date"}),
         }
 
+    # Existing validations
     def clean_display_name(self):
         name = (self.cleaned_data.get("display_name") or "").strip()
-        if len(name) < 2 or len(name) > 50:
+        if name and not (2 <= len(name) <= 50):
             raise ValidationError("Display name must be between 2 and 50 characters.")
         return name
 
@@ -53,17 +60,31 @@ class ProfileEditForm(forms.ModelForm):
         return phone
 
     def clean_birthdate(self):
-        bd = self.cleaned_data.get("birthdate")
-        if bd and bd > timezone.now().date():
+        b = self.cleaned_data.get("birthdate")
+        if b and b > timezone.now().date():
             raise ValidationError("Birthdate cannot be in the future.")
-        return bd
+        return b
+
+    # NEW:
+    def clean_height_cm(self):
+        h = self.cleaned_data.get("height_cm")
+        if h is None:
+            return h
+        if not (80 <= h <= 250):
+            raise ValidationError("Height must be between 80 and 250 cm.")
+        return h
+
+    def clean_weight_kg(self):
+        w = self.cleaned_data.get("weight_kg")
+        if w is None:
+            return w
+        if not (25 <= float(w) <= 300):
+            raise ValidationError("Weight must be between 25 and 300 kg.")
+        # Optional: normalize to 2 decimals
+        return round(w, 2)
 
 
 class HandleChangeForm(forms.ModelForm):
-    """
-    Separate form just to change the handle with proper uniqueness + regex validation.
-    Use this if later you want a dedicated 'Change handle' UI or AJAX validator.
-    """
     class Meta:
         model = User
         fields = ["handle"]
@@ -71,22 +92,16 @@ class HandleChangeForm(forms.ModelForm):
     def clean_handle(self):
         handle = (self.cleaned_data.get("handle") or "").strip().lower()
         handle_validator(handle)
-
-        # Uniqueness check that allows the current user to keep their handle
-        qs = User.objects.filter(handle=handle)
+        # Ensure uniqueness excluding current user
+        qs = User.objects.filter(handle__iexact=handle)
         if self.instance and self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
-            raise ValidationError("That handle is already taken.")
+            raise ValidationError("This handle is already taken.")
         return handle
 
 
 class AvatarForm(forms.ModelForm):
-    """
-    Minimal form to update avatar with:
-    - extension whitelist (jpg/jpeg/png/webp)
-    - size limit (2 MB)
-    """
     class Meta:
         model = User
         fields = ["avatar"]
@@ -95,14 +110,30 @@ class AvatarForm(forms.ModelForm):
         f = self.cleaned_data.get("avatar")
         if not f:
             return f
-
-        # File size
-        if getattr(f, "size", 0) > MAX_AVATAR_BYTES:
-            raise ValidationError("Image too large (max 2 MB).")
-
-        # Extension check
-        name = (getattr(f, "name", "") or "").lower()
-        ext = name.rsplit(".", 1)[-1] if "." in name else ""
+        # Size
+        if hasattr(f, "size") and f.size > MAX_AVATAR_BYTES:
+            raise ValidationError("Avatar file is too large (max 2 MB).")
+        # Extension
+        name = getattr(f, "name", "") or ""
+        ext = name.rsplit(".", 1)[-1].lower() if "." in name else ""
         if ext not in ALLOWED_IMAGE_EXTS:
-            raise ValidationError("Unsupported image type. Use JPG, JPEG, PNG, or WEBP.")
+            raise ValidationError("Unsupported image type. Use JPG, PNG, or WebP.")
         return f
+
+
+# --- Registration -----------------------------------------------------------------
+
+class RegistrationForm(UserCreationForm):
+    """Simple signup: username, email, password + display_name and role."""
+    class Meta(UserCreationForm.Meta):
+        model = get_user_model()
+        fields = ("username", "email", "display_name", "role")
+
+    def clean_email(self):
+        email = (self.cleaned_data.get("email") or "").strip().lower()
+        if not email:
+            return email
+        UserModel = get_user_model()
+        if UserModel.objects.filter(email__iexact=email).exists():
+            raise ValidationError("An account with this email already exists.")
+        return email
