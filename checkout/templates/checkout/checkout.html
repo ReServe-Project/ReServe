@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% load static %} {# Make sure you load static files if you have a static folder #}
+
+{% block meta %}
+<title>Checkout</title>
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}"> {# Link to a new CSS file for checkout #}
+{% endblock meta %}
+
+{% block content %}
+<div class="checkout-container">
+    <a href="javascript:history.back()" class="back-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </a>
+    <h1 class="checkout-title">Checkout</h1>
+
+    <div class="checkout-content">
+        <div class="booking-details-card">
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="class_name">Class Name</label>
+                    <input type="text" id="class_name" value="{{ class.class_name }}" readonly class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.full_name.id_for_label }}">Full Name</label>
+                    {{ form.full_name }}
+                    {% if form.full_name.errors %}<div class="error">{{ form.full_name.errors }}</div>{% endif %}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half-width">
+                        <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                        {{ form.phone_number }}
+                        {% if form.phone_number.errors %}<div class="error">{{ form.phone_number.errors }}</div>{% endif %}
+                    </div>
+                    <div class="form-group half-width">
+                        <label for="{{ form.email.id_for_label }}">Email</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}<div class="error">{{ form.email.errors }}</div>{% endif %}
+                    </div>
+                </div>
+                
+                {# Hidden fields for participant and total_price if not taken from form #}
+                {# For now, assuming participant is 1 and total_price is class.price #}
+                <input type="hidden" name="participants" value="1"> 
+                <input type="hidden" name="total_price" value="{{ class.price }}">
+                
+                {# The form submit button will be in the payment card section #}
+            </form>
+        </div>
+
+        <div class="payment-card">
+            <h2>QRIS Payment Only</h2>
+            <div class="qris-image-placeholder">
+                {# This is where you would potentially put a QRIS image if you had one #}
+                {# <img> #}
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="agree_qris" name="agree_qris" required>
+                <label for="agree_qris">I agree to pay using QRIS</label>
+            </div>
+            <button type="submit" form="checkout_form" class="confirm-button">Confirm Checkout</button>
+        </div>
+    </div>
+</div>
+{% endblock content %}

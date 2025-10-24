@@ -1,0 +1,171 @@
+/* checkout/static/css/checkout.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7; /* Light background as in design */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align to top */
+    min-height: 100vh;
+}
+
+.checkout-container {
+    background-color: #fff; /* White background for the main content area */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 90%; /* Adjust as needed */
+    max-width: 1000px; /* Max width to keep it centered */
+    margin-top: 50px; /* Space from the top */
+    position: relative; /* For back button positioning */
+}
+
+.back-button {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    color: #333;
+    text-decoration: none;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.back-button svg {
+    margin-right: 5px;
+}
+
+.checkout-title {
+    font-size: 2em;
+    color: #333;
+    margin-left: 50px; /* Offset for back button */
+    margin-bottom: 30px;
+}
+
+.checkout-content {
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.booking-details-card {
+    flex: 2; /* Takes more space */
+    background-color: #f9f9f9;
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.payment-card {
+    flex: 1; /* Takes less space */
+    background-color: #f0f0f0; /* Slightly darker background for payment */
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    text-align: center;
+}
+
+.payment-card h2 {
+    color: #4A4A4A; /* Dark blue/purple from your design */
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
+.qris-image-placeholder {
+    width: 150px; /* Placeholder size for QRIS image */
+    height: 150px;
+    background-color: #ddd;
+    margin: 20px auto;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #888;
+    font-size: 0.9em;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="tel"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box; /* Include padding in width */
+}
+
+input[type="text"][readonly] {
+    background-color: #e9e9e9;
+    cursor: not-allowed;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-row .half-width {
+    flex: 1;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+}
+
+.confirm-button {
+    background-color: #6A1B9A; /* Deep purple from your design */
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.confirm-button:hover {
+    background-color: #5B148A;
+}
+
+.error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+/* Base styles for Django forms */
+/* Adjust .as_p output if you use it for error messages */
+.errorlist {
+    color: red;
+    margin-top: 5px;
+    list-style-type: none;
+    padding: 0;
+}
