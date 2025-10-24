@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Blogs{% endblock title %}
+
+{% block content %}
+<div class="min-h-screen bg-[#F7F4EC] py-10">
+
+  <!-- Header -->
+  <header class="max-w-3xl mx-auto text-center px-4">
+    <h1 class="font-head font-extrabold md:text-5xl text-[#434162]">
+      Share Your <span class="text-[#F1642E]">Blogs</span> With Us!
+    </h1>
+    <p class="font-sub font-semibold mt-2 text-[#505050]">The Latest Buzz</p>
+
+    <!-- OPEN MODAL BUTTON -->
+    <button id="openCreateBtn"
+      type="button"
+      class="inline-flex items-center justify-center mt-6 px-5 py-2 rounded-full bg-[#504E76] text-white text-sm shadow hover:bg-[#35344F]">
+      + Create Now!
+    </button>
+  </header>
+
+  {% if not blog_list %}
+    <p class="text-center text-slate-500 mt-16">No data available in Blog.</p>
+  {% else %}
+  <!-- Cards -->
+  <section class="mt-10 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
+    {% for blog in blog_list %}
+    <article class="relative bg-white rounded-[28px] shadow-lg ring-1 ring-black/5 p-4 md:p-6">
+      <div class="relative">
+        {% if blog.thumbnail %}
+          <img src="{{ blog.thumbnail }}" alt="thumbnail"
+              class="h-56 w-full object-cover rounded-[22px]">
+        {% else %}
+          <div class="h-56 w-full rounded-[22px] bg-slate-200"></div>
+        {% endif %}
+
+        <!-- Floating circle button (arrow), color #434162 with white ring -->
+        <a aria-label="Read {{ blog.title }}" href="{% url 'blog:blog_details' blog.id %}"
+          class="absolute -bottom-6 right-6 inline-flex h-16 w-16 items-center justify-center
+                  rounded-full bg-[#434162] text-white shadow-lg ring-4 ring-white
+                  hover:bg-[#353357]">
+          <!-- up-right arrow icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-7 w-7 fill-current">
+            <path d="M7 7a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v9a1 1 0 1 1-2 0V9.414l-9.293 9.293a1 1 0 0 1-1.414-1.414L14.586 8H8a1 1 0 0 1-1-1Z"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- spacing accounts for the floating button overlap -->
+      <h3 class="mt-10 font-head text-3xl font-extrabold leading-tight text-[#793217]">
+        <a href="{% url 'blog:blog_details' blog.id %}">{{ blog.title }}</a>
+      </h3>
+      <p class="mt-2 text-slate-600">
+        {{ blog.content|default:blog.content|truncatewords:22 }}
+      </p>
+    </article>
+    {% endfor %}
+  </section>
+  {% endif %}
+</div>
+
+<!-- CREATE BLOG MODAL -->
+<div id="createModal" class="fixed inset-0 z-[100] hidden" aria-hidden="true">
+  <div id="modalBackdrop" class="absolute inset-0 bg-black/50"></div>
+  <div class="absolute inset-0 flex items-center justify-center p-4">
+    <div class="w-full max-w-lg rounded-[28px] bg-[#F7F4EC] shadow-xl ring-1 ring-black/10 p-6 md:p-8">
+      <div class="text-center mb-4">
+        <h2 class="font-head text-3xl font-extrabold text-slate-800">Create Blog</h2>
+      </div>
+
+      <form id="createBlogForm" method="POST" action="{% url 'blog:create_blog' %}" class="space-y-5">
+        {% csrf_token %}
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700">Title</label>
+          <input type="text" name="title" placeholder="Enter title" required
+                 class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 placeholder-slate-400 outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700">Thumbnail</label>
+          <input type="url" name="thumbnail" placeholder="Link"
+                 class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 placeholder-slate-400 outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700">Content</label>
+          <textarea name="content" rows="6" placeholder="Enter content"
+                    class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 placeholder-slate-400 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+        </div>
+
+        <p id="formErrors" class="hidden text-sm text-red-600"></p>
+
+        <div class="mt-6 flex items-center justify-between gap-4">
+          <button type="button" id="cancelCreateBtn"
+                  class="w-40 rounded-xl border border-orange-300 bg-orange-50 px-5 py-3 font-semibold text-orange-700 hover:bg-orange-100">
+            Cancel
+          </button>
+          <button type="submit"
+                  class="w-44 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white hover:bg-orange-600">
+            Create
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const modal     = document.getElementById('createModal');
+  const backdrop  = document.getElementById('modalBackdrop');
+  const openBtn   = document.getElementById('openCreateBtn');
+  const cancelBtn = document.getElementById('cancelCreateBtn');
+  const form      = document.getElementById('createBlogForm');
+  const errorBox  = document.getElementById('formErrors');
+
+  if (!modal || !openBtn) return;
+
+  const openModal  = () => modal.classList.remove('hidden');
+  const closeModal = () => {
+    modal.classList.add('hidden');
+    if (errorBox) { errorBox.classList.add('hidden'); errorBox.textContent = ''; }
+  };
+
+  openBtn.addEventListener('click', openModal);
+  backdrop?.addEventListener('click', closeModal);
+  cancelBtn?.addEventListener('click', closeModal);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  // AJAX submit (optional; you can remove this to let normal POST+redirect happen)
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const url = form.getAttribute('action');
+    const formData = new FormData(form);
+
+    try {
+      const resp = await fetch(url, { method: 'POST', body: formData });
+      if (resp.ok) { window.location.reload(); }
+      else {
+        errorBox.textContent = 'Could not create blog. Please check your inputs.';
+        errorBox.classList.remove('hidden');
+      }
+    } catch {
+      errorBox.textContent = 'Network error. Try again.';
+      errorBox.classList.remove('hidden');
+    }
+  });
+});
+</script>
+{% endblock scripts %}

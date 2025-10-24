@@ -10,6 +10,7 @@ urlpatterns = [
     # your existing apps
     path('', include('accounts.urls')),
     path('', include('main.urls')),
+    path('blog/', include('blog.urls'))
 ]
 
 if settings.DEBUG:

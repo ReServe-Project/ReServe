@@ -1,50 +1,60 @@
-# blog/views.py
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
-from django import forms
-from .models import Blogs
+from blog.forms import BlogForm
+from blog.models import Blog
+from django.utils import timezone
+from django.http import HttpResponse
+from django.core import serializers
 
-class BlogForm(forms.ModelForm):
-    class Meta:
-        model = Blogs
-        fields = ["title", "date_blog", "description", "thumbnail"]
-        widgets = {"date_blog": forms.DateInput(attrs={"type": "date"}),
-                   "description": forms.Textarea(attrs={"rows": 4})}
+def main_blog(request):
+    blog_list = Blog.objects.all()
 
-def show_blog(request):
-    blogs = Blogs.objects.order_by("-date_blog", "-time_blog")
-    return render(request, "show_blog.html", {"blogs": blogs})
+    context = {
+        'blog_list': blog_list
+    }
 
-@login_required
+    return render(request, "main_blog.html", context)
+
 def create_blog(request):
+    form = BlogForm(request.POST or None)
     if request.method == "POST":
-        form = BlogForm(request.POST)
         if form.is_valid():
-            blog = form.save(commit=False)
-            blog.creator = request.user          # <-- fix IntegrityError
-            blog.save()
-            return redirect("blog:show_blog")
-    else:
-        form = BlogForm()
-    return render(request, "blog_form.html", {"form": form, "mode": "create"})
+            obj = form.save(commit=False)
+            obj.created_at = timezone.now().date()
+            obj.save()
+            return redirect('blog:main_blog')
+    return render(request, "create_blog.html", {"form": form})
 
-@login_required
-def edit_blog(request, pk):
-    blog = get_object_or_404(Blogs, pk=pk, creator=request.user)  # optional ownership check
-    if request.method == "POST":
-        form = BlogForm(request.POST, instance=blog)
-        if form.is_valid():
-            form.save()
-            return redirect("blog:show_blog")
-    else:
-        form = BlogForm(instance=blog)
-    return render(request, "blog_form.html", {"form": form, "mode": "edit", "blog": blog})
+def blog_details(request, id):
+    blog = get_object_or_404(Blog, pk=id)
 
-@login_required
-def delete_blog(request, pk):
-    blog = get_object_or_404(Blogs, pk=pk, creator=request.user)  # optional ownership check
-    if request.method == "POST":
-        blog.delete()
-        return redirect("blog:show_blog")
-    return render(request, "confirm_delete.html", {"blog": blog})
+    context = {
+        'blog': blog
+    }
+
+    return render(request, "blog_details.html", context)
+
+def show_xml(request):
+    blog_list = Blog.objects.all()
+    xml_data = serializers.serialize("xml", blog_list)
+    return HttpResponse(xml_data, content_type="blog/xml")
+
+def show_json(request):
+    blog_list = Blog.objects.all()
+    json_data = serializers.serialize("json", blog_list)
+    return HttpResponse(json_data, content_type="blog/json")
+
+def show_xml_by_id(request, blog_id):
+    try:
+        blog_item = Blog.objects.filter(pk=blog_id)
+        xml_data = serializers.serialize("xml", blog_item)
+        return HttpResponse(xml_data, content_type="blog/xml")
+    except Blog.DoesNotExist:
+        return HttpResponse(status=404)
+    
+def show_json_by_id(request, blog_id):
+    try:
+        blog_item = Blog.objects.get(pk=blog_id)
+        json_data = serializers.serialize("json", [blog_item])
+        return HttpResponse(json_data, content_type="application/json")
+    except Blog.DoesNotExist:
+        return HttpResponse(status=404)
