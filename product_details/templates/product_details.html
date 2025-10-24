@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'product_details/product_details.css' %}">
+
+<div class="p-8 max-w-6xl mx-auto bg-[#f4f4f4] rounded-xl">
+  <div class="flex flex-col md:flex-row gap-8">
+    <div class="w-full md:w-1/2 border rounded-xl h-64 bg-gray-200 flex items-center justify-center">
+      {% if class_obj.image %}
+        <img src="{{ class_obj.image.url }}" alt="{{ class_obj.title }}" class="object-cover rounded-xl h-full w-full">
+      {% else %}
+        <p class="text-gray-500">No image available</p>
+      {% endif %}
+    </div>
+
+    <div class="flex flex-col justify-between w-full md:w-1/2">
+      <div>
+        <h1 class="text-3xl font-extrabold text-[#5a2b1f]">{{ class_obj.title }}</h1>
+        <p class="text-gray-700 mb-3">with <strong>{{ class_obj.instructor.display_name }}</strong></p>
+
+        <div class="flex flex-wrap gap-3 mb-3">
+          <span class="border rounded-full px-3 py-1 text-sm bg-white">{{ class_obj.location }}</span>
+          <span class="border rounded-full px-3 py-1 text-sm bg-white">{{ class_obj.display_datetime }}</span>
+        </div>
+
+        <p class="text-gray-700 text-sm">{{ class_obj.description }}</p>
+      </div>
+
+      <a href="#" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full self-start mt-4 transition">
+        Checkout
+      </a>
+    </div>
+  </div>
+
+  <div class="mt-10 border rounded-xl p-6 bg-white">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold text-gray-800">Reviews</h2>
+      {% if user.is_authenticated %}
+      <button id="openReviewModal" class="bg-[#4e4b8a] text-white px-4 py-2 rounded-full text-sm hover:bg-[#3d3a74]">
+        + Create My Review
+      </button>
+      {% endif %}
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      {% for review in reviews %}
+      <div class="bg-[#fff9e6] rounded-xl p-4 shadow-sm flex gap-3 items-start">
+        <img src="{{ review.user.avatar.url }}" class="w-12 h-12 rounded-full object-cover" alt="Avatar">
+        <div class="flex-1">
+          <div class="flex justify-between items-center">
+            <h3 class="font-semibold">{{ review.user.display_name }}</h3>
+            <div class="text-yellow-400">
+              {% for i in "123" %}
+                {% if forloop.counter <= review.rating %}⭐{% else %}☆{% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          <p class="text-gray-700 text-sm mt-1">{{ review.comment }}</p>
+
+          {% if review.user == user %}
+          <div class="text-right mt-2">
+            <a href="{% url 'product_details:edit_review' review.id %}" class="text-sm text-blue-600">Edit</a> |
+            <a href="{% url 'product_details:delete_review' review.id %}" class="text-sm text-red-600">Delete</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-gray-500">No reviews yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Review Modal -->
+<div id="reviewModal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+    <h3 class="text-lg font-bold mb-4">Create Review</h3>
+    <form method="POST" action="{% url 'product_details:add_review' class_obj.pk %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="flex justify-end gap-3 mt-4">
+        <button type="button" id="closeReviewModal" class="px-4 py-2 border rounded">Cancel</button>
+        <button type="submit" class="bg-[#4e4b8a] text-white px-4 py-2 rounded">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.getElementById('openReviewModal')?.addEventListener('click', () => {
+  document.getElementById('reviewModal').classList.remove('hidden');
+});
+document.getElementById('closeReviewModal')?.addEventListener('click', () => {
+  document.getElementById('reviewModal').classList.add('hidden');
+});
+</script>
+
+{% endblock %}
+
