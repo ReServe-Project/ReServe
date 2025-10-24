@@ -6,5 +6,5 @@ from .models import Booking
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
-        # List the fields you want the user to fill out
+        # Only include the fields shown in the design
         fields = ['full_name', 'email', 'phone_number']
