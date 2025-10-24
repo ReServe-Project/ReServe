@@ -7,6 +7,7 @@ class Blog(models.Model):
     content = models.TextField()
     thumbnail = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    
 
     def __str__(self):
         return self.title
