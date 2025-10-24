@@ -1,41 +1,57 @@
 from django.db import models
-from django.conf import settings
-from django.utils import timezone
+from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator, MaxValueValidator
 
-User = settings.AUTH_USER_MODEL
+User = get_user_model()
 
-
-class Class(models.Model):
-    title = models.CharField(max_length=100)
-    instructor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='instructed_classes')
-    location = models.CharField(max_length=100)
-    date_time = models.DateTimeField(null=True, blank=True, help_text="Leave blank if by appointment")
-    description = models.TextField()
-    image = models.ImageField(upload_to='class_images/', blank=True, null=True)
-
-    def display_datetime(self):
-        if not self.date_time:
-            return "By Appointment"
-        return self.date_time.strftime("%d %b %Y, %H:%M")
-
+class ClassDetails(models.Model):
+    CATEGORY_CHOICES = [
+        ('yoga', 'Yoga'),
+        ('pilates', 'Pilates'),
+        ('dance', 'Dance'),
+        ('muay_thai', 'Muay Thai'),
+        ('boxing', 'Boxing'),
+        ('ice_skating', 'Ice Skating'),
+    ]
+    
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    class_name = models.CharField(max_length=200)
+    instructor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='classes_teaching')
+    is_by_appointment = models.BooleanField(default=False)
+    date_time = models.DateTimeField(null=True, blank=True)
+    location = models.CharField(max_length=200)
+    price = models.DecimalField(max_digits=10, decimal_places=0)
+    description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='class_images/', null=True, blank=True)
+    
+    def get_schedule_display(self):
+        if self.is_by_appointment:
+            return "By appointment"
+        elif self.date_time:
+            return self.date_time.strftime("%Y-%m-%d %H:%M")
+        return "Schedule not set"
+    
     def average_rating(self):
-        avg = self.reviews.aggregate(models.Avg('rating'))['rating__avg']
-        return round(avg or 0, 1)
-
+        reviews = self.reviews.all()
+        if reviews:
+            return round(sum(review.rating for review in reviews) / len(reviews), 1)
+        return 0
+    
+    def review_count(self):
+        return self.reviews.count()
+    
     def __str__(self):
-        return self.title
-
+        return self.class_name
 
 class Review(models.Model):
-    class_session = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='reviews')
+    class_details = models.ForeignKey(ClassDetails, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='class_reviews')
-    rating = models.PositiveSmallIntegerField(default=3)
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)])
     comment = models.TextField(blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
-
+    created_at = models.DateTimeField(auto_now_add=True)
+    
     class Meta:
-        ordering = ['-created_at']
-
+        unique_together = ['class_details', 'user']
+    
     def __str__(self):
-        return f"{self.user} - {self.class_session.title}"
+        return f"Review #{self.id}"
