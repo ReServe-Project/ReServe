@@ -1,7 +1,7 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
+from accounts.models import User
+
 
 CATEGORY_CHOICES = [
     ("yoga","Yoga"), ("pilates","Pilates"), ("dance","Dance"),

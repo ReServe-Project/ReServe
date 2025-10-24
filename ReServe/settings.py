@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'main',
     'home_search',
+    'accounts',
 
 ]
 

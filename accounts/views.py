@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
@@ -11,9 +10,9 @@ from django.views import View
 from django.views.decorators.http import require_GET
 from django.views.generic import DetailView, UpdateView, CreateView
 
-from .forms import ProfileEditForm, AvatarForm, HandleChangeForm, RegistrationForm
+from accounts.models import User
 
-User = get_user_model()
+from .forms import ProfileEditForm, AvatarForm, HandleChangeForm, RegistrationForm
 
 # -----------------------
 # Private (owner) views

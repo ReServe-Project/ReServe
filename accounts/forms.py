@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from django import forms
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.utils import timezone
 from django.contrib.auth.forms import UserCreationForm
 
-User = get_user_model()
+from accounts.models import User
 
 # --- Shared validators/constraints -------------------------------------------------
 
@@ -126,14 +125,14 @@ class AvatarForm(forms.ModelForm):
 class RegistrationForm(UserCreationForm):
     """Simple signup: username, email, password + display_name and role."""
     class Meta(UserCreationForm.Meta):
-        model = get_user_model()
+        model = User
         fields = ("username", "email", "display_name", "role")
 
     def clean_email(self):
         email = (self.cleaned_data.get("email") or "").strip().lower()
         if not email:
             return email
-        UserModel = get_user_model()
+        UserModel = User
         if UserModel.objects.filter(email__iexact=email).exists():
             raise ValidationError("An account with this email already exists.")
         return email
