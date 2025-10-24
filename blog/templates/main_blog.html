@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}Blogs{% endblock title %}
 
 {% block content %}
@@ -11,6 +11,15 @@
       Share Your <span class="text-[#F1642E]">Blogs</span> With Us!
     </h1>
     <p class="font-sub font-semibold mt-2 text-[#505050]">The Latest Buzz</p>
+
+  <!-- Header Image -->
+<div class="mt-4 relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen">
+  <img
+    src="{% static 'images/blog_header.png' %}"
+    alt="Blog header"
+    class="block w-screen h-56 md:h-72 lg:h-80 object-cover"
+  />
+</div>
 
     <!-- OPEN MODAL BUTTON -->
     <button id="openCreateBtn"
@@ -30,33 +39,53 @@
       <div class="relative">
         {% if blog.thumbnail %}
           <img src="{{ blog.thumbnail }}" alt="thumbnail"
-              class="h-56 w-full object-cover rounded-[22px]">
+               class="h-56 w-full object-cover rounded-[22px]">
         {% else %}
           <div class="h-56 w-full rounded-[22px] bg-slate-200"></div>
         {% endif %}
 
-        <!-- Floating circle button (arrow), color #434162 with white ring -->
+        {# top-left action pills for the owner #}
+        {% if request.user.is_authenticated and blog.author_id == request.user.id %}
+        <div class="absolute top-3 left-3 z-10 flex gap-3">
+          <form method="POST" action="{% url 'blog:delete_blog' blog.id %}"
+                onsubmit="return confirm('Delete this blog?');">
+            {% csrf_token %}
+            <button type="submit"
+              class="px-5 py-2 rounded-full bg-red-600 text-white text-sm font-semibold
+                     shadow-lg ring-2 ring-white/90 hover:bg-red-700">
+              Delete
+            </button>
+          </form>
+          <a href="{% url 'blog:edit_blog' blog.id %}"
+             class="px-5 py-2 rounded-full bg-[#1E90FF] text-white text-sm font-semibold
+                    shadow-lg ring-2 ring-white/90 hover:bg-[#1877d3]">
+            Edit
+          </a>
+        </div>
+        {% endif %}
+
+        <!-- bottom-right arrow button -->
         <a aria-label="Read {{ blog.title }}" href="{% url 'blog:blog_details' blog.id %}"
-          class="absolute -bottom-6 right-6 inline-flex h-16 w-16 items-center justify-center
+           class="absolute -bottom-6 right-6 inline-flex h-16 w-16 items-center justify-center
                   rounded-full bg-[#434162] text-white shadow-lg ring-4 ring-white
                   hover:bg-[#353357]">
-          <!-- up-right arrow icon -->
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-7 w-7 fill-current">
             <path d="M7 7a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v9a1 1 0 1 1-2 0V9.414l-9.293 9.293a1 1 0 0 1-1.414-1.414L14.586 8H8a1 1 0 0 1-1-1Z"/>
           </svg>
         </a>
       </div>
 
-      <!-- spacing accounts for the floating button overlap -->
-      <h3 class="mt-10 font-head text-3xl font-extrabold leading-tight text-[#793217]">
+      <!-- spacing for the floating arrow -->
+      <h3 class="mt-5 font-head text-3xl font-extrabold leading-tight text-[#793217]">
         <a href="{% url 'blog:blog_details' blog.id %}">{{ blog.title }}</a>
       </h3>
       <p class="mt-2 text-slate-600">
-        {{ blog.content|default:blog.content|truncatewords:22 }}
+        {{ blog.content|truncatewords:22 }}
       </p>
     </article>
     {% endfor %}
   </section>
+
   {% endif %}
 </div>
 
