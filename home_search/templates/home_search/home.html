@@ -1,0 +1,211 @@
+{% extends 'base.html' %} 
+{% load static %}
+
+{% block title %}ReServe - Home{% endblock %}
+
+{% block content %}
+
+
+
+<!-- 🔶 Gradient background for the whole home page content -->
+<div class="min-h-screen bg-gradient-to-b from-[#FBF8EC] via-[#F8EDE3] to-[#F6DAC8]">
+
+  {% static 'img/landing.png' as landing_url %}
+
+  <!-- HERO: background calendar, logo left, copy+button right -->
+  <section class="relative isolate -mt-px">  <!-- -mt-px closes any hairline gap -->
+  <div class="absolute inset-0 -z-10 bg-center bg-cover bg-no-repeat"
+       style="background-image:url('{{ landing_url }}');"></div>
+  <div class="absolute inset-0 -z-10 bg-gradient-to-b from-[#FFF8EC] via-transparent to-[#FFF8EC]"></div>
+
+  <div class="mx-auto max-w-7xl px-6 py-16 lg:py-24">
+      <!-- 2 columns: logo (left) and text (right) -->
+      <div class="grid md:grid-cols-[minmax(0,600px)_minmax(0,520px)] gap-8 items-end">
+        <!-- LEFT: big ReServe logo aligned to the bottom grid line -->
+        <div class="flex items-end">
+          <img src="{% static 'img/reserve-logo.png' %}" alt="ReServe logo"
+               class="w-full max-w-[580px] drop-shadow-[0_10px_24px_rgba(0,0,0,0.18)]">
+        </div>
+
+        <!-- RIGHT: sentence + button (no card, sits on the background) -->
+        <div class="md:pb-6">
+          <p class="text-gray-900 text-2xl md:text-[34px] leading-snug md:leading-[1.25] font-medium">
+            Discover your favorite classes and <span class="font-semibold">start exploring</span> today.
+          </p>
+
+          <a href="{% url 'home_search:search' %}"
+             class="mt-8 inline-flex items-center justify-center px-7 py-3.5 rounded-2xl
+                    bg-[#E3713B] text-white text-lg font-semibold shadow-[0_8px_18px_-6px_rgba(227,113,59,0.6)]
+                    hover:brightness-110 transition">
+            Explore Now!
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT / WHAT IS RESERVE -->
+  <section class="relative max-w-7xl mx-auto px-6 md:px-12 pb-16">
+    <div class="grid md:grid-cols-2 gap-10 lg:gap-14 items-start">
+      <!-- LEFT: stacked images -->
+      <div class="space-y-6">
+        <div class="rounded-[28px] overflow-hidden shadow-xl">
+          <img
+            src="https://i.pinimg.com/736x/c9/8f/28/c98f28acdcbc6cdfe88a79b6c506a985.jpg"
+            alt="Yoga class"
+            class="w-full h-64 md:h-72 object-cover">
+        </div>
+
+        <div class="rounded-[28px] overflow-hidden shadow-xl">
+          <img
+            src="https://i.pinimg.com/1200x/ad/f2/ed/adf2ed8cd10b911e48371e5259a7ca98.jpg"
+            alt="Boxing training"
+            class="w-full h-56 md:h-60 object-cover">
+        </div>
+      </div>
+
+      <!-- RIGHT: purple card -->
+      <div class="bg-[#4C4974] text-white rounded-[44px] p-6 md:p-8 shadow-2xl">
+        <div class="inline-block bg-white/90 text-[#3D3C5B] rounded-full px-7 py-3
+                    font-extrabold text-2xl md:text-3xl mb-6">
+          What is ReServe?
+        </div>
+        <p class="text-white/95 leading-relaxed text-lg md:text-xl">
+          ReServe is a smart class booking app designed to make joining fitness sessions simple,
+          fast, and stress-free. With fitness classes like Pilates, Yoga, and Boxing becoming
+          increasingly popular, spots can fill up within minutes. ReServe solves this problem by
+          giving users real-time access to available classes and studios, allowing them to easily
+          find and reserve sessions anytime, anywhere.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUR CLASSES (horizontal scroller) -->
+  <section class="max-w-7xl mx-auto px-6 md:px-12 pt-10 pb-12">
+    <div class="flex items-center gap-6 mb-6">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900">Our Classes</h2>
+      <div class="h-3 flex-1 rounded-full bg-gradient-to-r from-[#E9A07C] via-[#D07E67] to-[#8C89B2] opacity-70"></div>
+    </div>
+
+    <div class="relative">
+      <!-- optional fade edges (match the page gradient's light tone) -->
+      <div class="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-[#FBF8EC] to-transparent"></div>
+      <div class="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-[#FBF8EC] to-transparent"></div>
+
+      <div class="overflow-x-auto pb-3 -mx-6 px-6 scroll-smooth"
+           style="scrollbar-width:none;-ms-overflow-style:none;">
+        <div class="flex gap-4 lg:gap-6 snap-x snap-mandatory">
+          <!-- Yoga -->
+<a href="/search/?category=yoga"
+   class="group flex-none w-72 md:w-80 snap-start rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition">
+  <div class="relative aspect-[4/3]"> <!-- FIX: same aspect as others; no extra rounding/bg -->
+    <img src="https://i.pinimg.com/736x/64/e7/9a/64e79a663561e55a1303718d3954a27a.jpg"
+         alt="Yoga" class="absolute inset-0 w-full h-full object-cover block"> <!-- block removes inline gap -->
+    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+    <div class="absolute bottom-3 left-4 right-4 text-white text-2xl font-extrabold drop-shadow-sm">Yoga</div>
+  </div>
+</a>
+
+
+          <!-- Pilates -->
+          <a href="/search/?category=pilates"
+             class="group flex-none w-72 md:w-80 snap-start rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition">
+            <div class="relative aspect-[4/3]">
+              <img src="https://i.pinimg.com/736x/4c/2b/71/4c2b71fcc015c795db29d53e3df34c8c.jpg"
+                   alt="Pilates" class="absolute inset-0 w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+              <div class="absolute bottom-3 left-4 right-4 text-white text-2xl font-extrabold drop-shadow-sm">Pilates</div>
+            </div>
+          </a>
+
+          <!-- Dance -->
+          <a href="/search/?category=dance"
+             class="group flex-none w-72 md:w-80 snap-start rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition">
+            <div class="relative aspect-[4/3]">
+              <img src="https://i.pinimg.com/736x/74/c2/c8/74c2c835a4c6ef75b8eb1d3b03135f84.jpg"
+                   alt="Dance" class="absolute inset-0 w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+              <div class="absolute bottom-3 left-4 right-4 text-white text-2xl font-extrabold drop-shadow-sm">Dance</div>
+            </div>
+          </a>
+
+          <!-- Boxing -->
+          <a href="/search/?category=boxing"
+             class="group flex-none w-72 md:w-80 snap-start rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition">
+            <div class="relative aspect-[4/3]">
+              <img src="https://i.pinimg.com/1200x/4f/b4/1f/4fb41fff80786810cc63d1e5b5ffcb37.jpg"
+                   alt="Boxing" class="absolute inset-0 w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+              <div class="absolute bottom-3 left-4 right-4 text-white text-2xl font-extrabold drop-shadow-sm">Boxing</div>
+            </div>
+          </a>
+
+          <!-- Muaythai -->
+          <a href="/search/?category=muaythai"
+             class="group flex-none w-72 md:w-80 snap-start rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition">
+            <div class="relative aspect-[4/3]">
+              <img src="https://i.pinimg.com/1200x/d3/d4/dd/d3d4dd599a1c854e7769bf71f906520b.jpg"
+                   alt="Muaythai" class="absolute inset-0 w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+              <div class="absolute bottom-3 left-4 right-4 text-white text-2xl font-extrabold drop-shadow-sm">Muaythai</div>
+            </div>
+          </a>
+
+          <!-- Ice Skating -->
+<a href="/search/?category=ice-skating"
+   class="group flex-none w-72 md:w-80 snap-start rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition">
+  <div class="relative aspect-[4/3]">
+    <img src="https://i.pinimg.com/1200x/24/1a/e9/241ae90463cbcd9a10cb735316519b8c.jpg"
+         alt="Ice Skating" class="absolute inset-0 w-full h-full object-cover block">
+    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+    <div class="absolute bottom-3 left-4 right-4 text-white text-2xl font-extrabold drop-shadow-sm">
+      Ice Skating
+    </div>
+  </div>
+</a>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-7">
+      <a href="/search/"
+         class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#E3713B] text-white text-sm font-semibold hover:brightness-110 transition">
+        Explore All
+      </a>
+    </div>
+  </section>
+
+  <!-- Full-bleed CTA with no extra spacing and no footer underneath -->
+<section class="relative isolate mt-6">
+  <div class="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden mb-[-1px]">
+    <img
+      src="{% static 'img/ready.png' %}"
+      alt="Yoga class"
+      class="w-full h-[420px] md:h-[520px] object-cover block">
+
+ 
+
+    <!-- centered headline -->
+    <h2
+      class="absolute left-1/2 -translate-x-1/2
+             top-[16%] md:top-[18%]
+             whitespace-nowrap text-center
+             text-white font-extrabold
+             text-[clamp(22px,4vw,48px)]
+             drop-shadow-[0_5px_12px_rgba(0,0,0,1)]">
+      Are you ready to serve?
+    </h2>
+  </div>
+</section>
+
+{# No footer at all on this page #}
+{% block footer %}{% endblock %}
+
+
+</div> <!-- 🟠 end gradient wrapper -->
+
+{% endblock %}
+
+
