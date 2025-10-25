@@ -7,23 +7,24 @@
 
   <!-- Purple header (taller) -->
   <section class="relative bg-[#434162] h-64 md:h-72">
-    <!-- Back button -->
-    <a href="{% url 'blog:main_blog' %}"
-    class="absolute left-16 top-12 grid place-items-center
-            h-12 w-12 rounded-full bg-white text-[#434162]
-            shadow ring-1 ring-black/10 hover:bg-slate-50"
-    aria-label="Back">
-    <svg viewBox="0 0 24 24" fill="none"
-       stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
-       class="h-7 w-7 block">
-    <path d="M15 19l-7-7 7-7" />
-    </svg>
-    </a>
   </section>
 
   <!-- Overlapping cream card (higher + wider like mockup) -->
   <div class="relative -mt-36 md:-mt-40 lg:-mt-44 mx-4 md:mx-8">
-    <div class="mx-auto max-w-6xl rounded-[28px] bg-[#FEFDF5] p-5 md:p-8 lg:p-9">
+    <div class="mx-auto max-w-6xl rounded-[28px] bg-[#FEFDF5] p-5 md:p-8 lg:p-9 relative">
+
+      <!-- Back button (placed on the cream card top-left) -->
+      <a href="{% url 'blog:main_blog' %}"
+         class="absolute -left-20 top-0 grid place-items-center
+                h-10 w-10 rounded-full bg-white text-[#434162]
+                shadow ring-1 ring-black/10 hover:bg-slate-50 z-20"
+         aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+             class="h-7 w-7 block">
+          <path d="M15 19l-7-7 7-7" />
+        </svg>
+      </a>
 
       <!-- Top row: small image left + title/meta right -->
       <div class="grid grid-cols-1 md:grid-cols-5 gap-6 md:gap-10 items-start">
@@ -31,9 +32,9 @@
         <div class="md:col-span-2">
           {% if blog.thumbnail %}
             <img src="{{ blog.thumbnail }}" alt="Blog thumbnail"
-                 class="w-full h-40 md:h-44 lg:h-48 object-cover rounded-[16px] ring-1 ring-black/5 shadow-sm">
+                 class="w-full h-48 md:h-56 lg:h-64 object-cover rounded-[16px] ring-1 ring-black/5 shadow-sm">
           {% else %}
-            <div class="w-full h-40 md:h-44 lg:h-48 rounded-[16px] bg-slate-200 ring-1 ring-black/5"></div>
+            <div class="w-full h-48 md:h-56 lg:h-64 rounded-[16px] bg-slate-200 ring-1 ring-black/5"></div>
           {% endif %}
         </div>
 
