@@ -1,5 +1,5 @@
 from django.urls import path
-from blog.views import main_blog, create_blog, blog_details, show_json_by_id, show_xml, show_json, show_xml_by_id
+from blog.views import main_blog, create_blog, blog_details, show_json_by_id, show_xml, show_json, show_xml_by_id, edit_blog, delete_blog
 
 app_name = 'blog'
 
@@ -11,4 +11,6 @@ urlpatterns = [
     path('json/', show_json, name='show_json'),
     path('xml/<str:id>/', show_xml_by_id, name='show_xml_by_id'),
     path('json/<str:id>/', show_json_by_id, name='show_json_by_id'),
+    path('edit/<str:id>/', edit_blog, name='edit_blog'),
+    path('delete/<str:id>/', delete_blog, name='delete_blog'),
 ]
