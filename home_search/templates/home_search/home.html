@@ -5,9 +5,6 @@
 
 {% block content %}
 
-
-
-<!-- 🔶 Gradient background for the whole home page content -->
 <div class="min-h-screen bg-gradient-to-b from-[#FBF8EC] via-[#F8EDE3] to-[#F6DAC8]">
 
   {% static 'img/landing.png' as landing_url %}
@@ -55,7 +52,6 @@
             alt="Yoga class"
             class="w-full h-64 md:h-72 object-cover">
         </div>
-
         <div class="rounded-[28px] overflow-hidden shadow-xl">
           <img
             src="https://i.pinimg.com/1200x/ad/f2/ed/adf2ed8cd10b911e48371e5259a7ca98.jpg"
@@ -188,15 +184,20 @@
  
 
     <!-- centered headline -->
-    <h2
-      class="absolute left-1/2 -translate-x-1/2
-             top-[16%] md:top-[18%]
-             whitespace-nowrap text-center
-             text-white font-extrabold
-             text-[clamp(22px,4vw,48px)]
-             drop-shadow-[0_5px_12px_rgba(0,0,0,1)]">
-      Are you ready to serve?
-    </h2>
+    <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-white">
+  <p class="mb-3 font-semibold tracking-wide
+             text-2xl md:text-3xl lg:text-4xl
+             drop-shadow-[0_3px_10px_rgba(0,0,0,0.55)]">
+    Are you ready to serve?
+  </p>
+
+  <h1 class="font-extrabold tracking-tight
+             text-5xl md:text-7xl lg:text-8xl
+             drop-shadow-[0_6px_18px_rgba(0,0,0,0.65)]">
+    Join Us Now!
+  </h1>
+</div>
+
   </div>
 </section>
 
