@@ -5,33 +5,93 @@
 <title>Register • ReServe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'accounts/css/profile.css' %}">
-{% endblock meta %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
+{% endblock %}
 
 {% block content %}
-<div class="container-narrow">
-  <div class="card" style="max-width:720px;margin:60px auto;">
-    <div class="section center">
-      <h3>Create your ReServe account</h3>
-      <p class="text-muted">Join and start booking classes in seconds.</p>
+<div class="auth-grid">
+
+  <!-- Left: Track visual -->
+  <section class="track-wrap">
+    <div class="logo-pill">
+      <img src="{% static 'accounts/img/logo.png' %}" alt="ReServe">
     </div>
-    <form method="post" class="form">
-      {% csrf_token %}
-      {{ form.non_field_errors }}
-      {% for field in form.visible_fields %}
-        <div class="field">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.help_text %}<div class="hint">{{ field.help_text }}</div>{% endif %}
-          {% if field.errors %}<div class="hint" style="color:#dc2626">{{ field.errors|join:", " }}</div>{% endif %}
-        </div>
-      {% endfor %}
-      <div class="actions">
-        <button class="btn btn-primary" type="submit">Sign up</button>
-        <a class="btn btn-outline" href="{% url 'login' %}">Back to login</a>
-      </div>
-    </form>
+    <!-- important: paint the background image here -->
+    <div class="track-hero" style="background-image:url('{% static 'accounts/img/track-bg.jpg' %}');"></div>
+  </section>
+
+  <!-- Right: Register form (use classes expected by auth.css) -->
+  <section class="form-panel">
+    <div class="form">
+      <h1>Register</h1>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        {% for field in form.visible_fields %}
+          <div>
+            <label for="{{ field.id_for_label }}">
+              {{ field.label }}
+              {% if field.name == 'role' %}
+                <a href="#" id="role-help" style="margin-left:.5rem; font-weight:600;">What is role?</a>
+              {% endif %}
+            </label>
+            {{ field }}
+            {% if field.errors %}
+              <div class="error-inline">{{ field.errors|join:", " }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <button class="primary-btn" type="submit">Register</button>
+
+        <p class="small-note">
+          Already have an account? <a href="{% url 'login' %}">Log in</a>
+        </p>
+      </form>
+    </div>
+  </section>
+
+</div>
+
+<!-- Role modal -->
+<div class="modal" id="role-modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="role-title">
+    <h3 id="role-title">What is role?</h3>
+    <p><strong>Instructor:</strong></p>
+    <ul>
+      <li>Access to create blogs</li>
+      <li>Access to create classes</li>
+    </ul>
+    <p style="margin-top:10px;"><strong>Member:</strong></p>
+    <ul>
+      <li>Access to create blogs</li>
+    </ul>
+    <div class="modal-actions">
+      <button type="button" id="role-ok">OK</button>
+    </div>
   </div>
 </div>
-{% endblock content %}
+
+<script>
+  (function () {
+    const help = document.getElementById('role-help');
+    const modal = document.getElementById('role-modal');
+    const okBtn = document.getElementById('role-ok');
+    if (help && modal && okBtn) {
+      help.addEventListener('click', function (e) {
+        e.preventDefault();
+        modal.style.display = 'flex';
+      });
+      okBtn.addEventListener('click', function () {
+        modal.style.display = 'none';
+      });
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) modal.style.display = 'none';
+      });
+    }
+  })();
+</script>
+{% endblock %}

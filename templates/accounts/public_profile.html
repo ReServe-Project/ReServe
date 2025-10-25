@@ -22,9 +22,6 @@
           {% if object.handle %}<span class="handle">@{{ object.handle }}</span>{% endif %}
           {% if object.get_role_display %}<span class="role-chip">{{ object.get_role_display }}</span>{% endif %}
         </div>
-        <div class="meta">
-          <div class="item">Location: <strong>{{ object.location|default:"—" }}</strong></div>
-        </div>
       </div>
     </div>
 

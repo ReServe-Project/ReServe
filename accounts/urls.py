@@ -13,11 +13,12 @@ urlpatterns = [
     path("profile/", views.ProfileView.as_view(), name="profile_view"),
     path("profile/edit/", views.ProfileEditView.as_view(), name="profile_edit"),
     path("profile/avatar/", views.AvatarUpdateView.as_view(), name="profile_avatar_update"),
+    path("profile/update/", views.ProfileUpdateAjax.as_view(), name="profile_update_ajax"),
 
     # PUBLIC PROFILE
     path("u/<slug:handle>/", views.PublicProfileView.as_view(), name="public_profile"),
 
-    # AJAX
+    # LEGACY AJAX (temporary stubs)
     path("profile/ajax/validate-handle/", views.validate_handle, name="ajax_validate_handle"),
     path("profile/ajax/update-phone/", views.UpdatePhoneAjax.as_view(), name="ajax_update_phone"),
 ]
