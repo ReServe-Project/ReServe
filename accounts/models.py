@@ -1,5 +1,5 @@
 ﻿# accounts/models.py
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
@@ -40,6 +40,28 @@ class User(AbstractUser):
         ("instructor", "Instructor"),
     ]
 
+    # --- Fix for clashes with auth.User ---
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name="groups",
+        blank=True,
+        help_text=(
+            "The groups this user belongs to. A user will get all permissions "
+            "granted to each of their groups."
+        ),
+        related_name="accounts_user_set",
+        related_query_name="accounts_user",
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        verbose_name="user permissions",
+        blank=True,
+        help_text="Specific permissions for this user.",
+        related_name="accounts_user_set",
+        related_query_name="accounts_user",
+    )
+    # --------------------------------------
+
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="member")
     display_name = models.CharField(max_length=50)
     handle = models.SlugField(
@@ -53,13 +75,17 @@ class User(AbstractUser):
         default="avatars/default.png",
     )
 
-    # Physical attributes only
     height_cm = models.PositiveSmallIntegerField(
-        null=True, blank=True, help_text="User height in centimeters (80–250)."
+        null=True,
+        blank=True,
+        help_text="User height in centimeters (80–250).",
     )
     weight_kg = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True,
-        help_text="User weight in kilograms (25.00–300.00)."
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="User weight in kilograms (25.00–300.00).",
     )
 
     def clean(self):
@@ -86,9 +112,7 @@ class User(AbstractUser):
 
     @property
     def reserve_id(self) -> str:
-        if self.pk:
-            return f"RS-{self.pk:06d}"
-        return "RS-000000"
+        return f"RS-{self.pk:06d}" if self.pk else "RS-000000"
 
     @property
     def display_label(self) -> str:
