@@ -6,6 +6,9 @@ from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
 
+
+# --- Validators --------------------------------------------------------------
+
 HANDLE_REGEX = r"^[a-z0-9_.]{3,20}$"
 handle_validator = RegexValidator(
     regex=HANDLE_REGEX,

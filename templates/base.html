@@ -2,12 +2,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    {% block meta %} {% endblock meta %}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}ReServe{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
 </head>
-
-<body>
-    {% block content %} {% endblock content %}
+<body class="min-h-screen bg-[#FFF8EC] text-[#1E1E1E]">
+  {% include 'navbar.html' %}
+  <!-- No margin or padding here -->
+  <main class="relative">
+    {% block content %}{% endblock %}
+  </main>
 </body>
 </html>
+
+
+

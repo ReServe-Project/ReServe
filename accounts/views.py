@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
@@ -10,6 +9,8 @@ from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.decorators.http import require_GET
 from django.views.generic import DetailView, UpdateView, CreateView
+
+from accounts.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.utils.decorators import method_decorator
 
@@ -18,8 +19,6 @@ from .forms import (
     AvatarForm,
     RegistrationForm,
 )
-
-User = get_user_model()
 
 # -----------------------
 # Private (owner) views

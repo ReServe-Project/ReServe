@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from django import forms
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm
 
-User = get_user_model()
+from accounts.models import User
 
 # --- Constraints used by Avatar upload -------------------------------------------------
 
@@ -86,14 +85,14 @@ class AvatarForm(forms.ModelForm):
 class RegistrationForm(UserCreationForm):
     """Signup: username, email, password + display_name and role."""
     class Meta(UserCreationForm.Meta):
-        model = get_user_model()
+        model = User
         fields = ("username", "email", "display_name", "role")
 
     def clean_email(self):
         email = (self.cleaned_data.get("email") or "").strip().lower()
         if not email:
             return email
-        UserModel = get_user_model()
+        UserModel = User
         if UserModel.objects.filter(email__iexact=email).exists():
             raise ValidationError("An account with this email already exists.")
         return email
