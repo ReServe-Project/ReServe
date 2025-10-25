@@ -5,16 +5,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}ReServe{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+
+  <!-- Load Tailwind once for the whole site -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Allow pages to inject extra <head> assets (fonts, page-specific CSS like auth.css, profile.css, etc.) -->
+  {% block meta %}{% endblock %}
 </head>
 <body class="min-h-screen bg-[#FFF8EC] text-[#1E1E1E]">
   {% include 'navbar.html' %}
-  <!-- No margin or padding here -->
   <main class="relative">
     {% block content %}{% endblock %}
   </main>
 </body>
 </html>
-
-
-
