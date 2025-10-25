@@ -83,16 +83,19 @@ class AvatarForm(forms.ModelForm):
 # --- Registration ---------------------------------------------------------------------
 
 class RegistrationForm(UserCreationForm):
-    """Signup: username, email, password + display_name and role."""
+    """Signup with username + role + password1/password2. display_name mirrors username."""
+    role = forms.ChoiceField(choices=User.ROLE_CHOICES)
+
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ("username", "email", "display_name", "role")
+        # UserCreationForm supplies password1/password2 automatically
+        fields = ("username", "role")
 
-    def clean_email(self):
-        email = (self.cleaned_data.get("email") or "").strip().lower()
-        if not email:
-            return email
-        UserModel = User
-        if UserModel.objects.filter(email__iexact=email).exists():
-            raise ValidationError("An account with this email already exists.")
-        return email
+    def save(self, commit=True):
+        user: User = super().save(commit=False)
+        # mirror username into display_name
+        user.display_name = self.cleaned_data["username"]
+        user.role = self.cleaned_data["role"]
+        if commit:
+            user.save()
+        return user

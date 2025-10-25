@@ -12,16 +12,15 @@
 {% block content %}
 <div class="auth-grid">
 
-  <!-- Left: Track visual -->
+  <!-- Left visual -->
   <section class="track-wrap">
     <div class="logo-pill">
       <img src="{% static 'accounts/img/logo.png' %}" alt="ReServe">
     </div>
-    <!-- important: paint the background image here -->
     <div class="track-hero" style="background-image:url('{% static 'accounts/img/track-bg.jpg' %}');"></div>
   </section>
 
-  <!-- Right: Register form (use classes expected by auth.css) -->
+  <!-- Right: Register form -->
   <section class="form-panel">
     <div class="form">
       <h1>Register</h1>
@@ -30,20 +29,43 @@
         {% csrf_token %}
         {{ form.non_field_errors }}
 
-        {% for field in form.visible_fields %}
-          <div>
-            <label for="{{ field.id_for_label }}">
-              {{ field.label }}
-              {% if field.name == 'role' %}
-                <a href="#" id="role-help" style="margin-left:.5rem; font-weight:600;">What is role?</a>
-              {% endif %}
-            </label>
-            {{ field }}
-            {% if field.errors %}
-              <div class="error-inline">{{ field.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-        {% endfor %}
+        <!-- Username -->
+        <div class="field">
+          <label for="{{ form.username.id_for_label }}">Username</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+            <div class="error-inline">{{ form.username.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Role (+ help link) -->
+        <div class="field">
+          <label for="{{ form.role.id_for_label }}">
+            Role
+            <a href="#" id="role-help" style="margin-left:.5rem; font-weight:600;">What is role?</a>
+          </label>
+          {{ form.role }}
+          {% if form.role.errors %}
+            <div class="error-inline">{{ form.role.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Passwords -->
+        <div class="field">
+          <label for="{{ form.password1.id_for_label }}">Password</label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}
+            <div class="error-inline">{{ form.password1.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        <div class="field">
+          <label for="{{ form.password2.id_for_label }}">Password confirmation</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}
+            <div class="error-inline">{{ form.password2.errors|join:", " }}</div>
+          {% endif %}
+        </div>
 
         <button class="primary-btn" type="submit">Register</button>
 
