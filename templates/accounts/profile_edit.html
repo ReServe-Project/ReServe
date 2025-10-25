@@ -30,6 +30,7 @@
       </div>
     </div>
 
+    <!-- Fallback form uses current form class on the view -->
     <form method="post" enctype="multipart/form-data" class="form">
       {% csrf_token %}
       {{ form.non_field_errors }}
@@ -37,32 +38,6 @@
       <div class="field">
         <label for="{{ form.display_name.id_for_label }}">Display name</label>
         {{ form.display_name }}
-      </div>
-
-      <div class="field">
-        <label for="{{ form.birthdate.id_for_label }}">Birthdate</label>
-        {{ form.birthdate }}
-      </div>
-
-      <div class="field">
-        <label for="{{ form.gender.id_for_label }}">Gender</label>
-        {{ form.gender }}
-      </div>
-
-      <div class="field">
-        <label for="{{ form.location.id_for_label }}">Location</label>
-        {{ form.location }}
-      </div>
-
-      <div class="field">
-        <label for="{{ form.phone.id_for_label }}">Phone</label>
-        {{ form.phone }}
-        <div class="hint">Format: +62812… or digits only</div>
-      </div>
-
-      <div class="field" style="grid-column:1 / -1">
-        <label for="{{ form.bio.id_for_label }}">Bio</label>
-        {{ form.bio }}
       </div>
 
       <div class="field">

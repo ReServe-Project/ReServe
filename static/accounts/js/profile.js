@@ -1,79 +1,139 @@
 // static/accounts/js/profile.js
+(function () {
+  // ---- helpers ----
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+  }
+  const csrftoken = getCookie('csrftoken');
 
-// ========== 1. Handle Availability Check ==========
-document.addEventListener("DOMContentLoaded", () => {
-    const handleField = document.querySelector("#id_handle");
-    const feedback = document.createElement("small");
-    if (handleField) {
-      handleField.parentElement.appendChild(feedback);
-  
-      handleField.addEventListener("input", async () => {
-        const val = handleField.value.trim();
-        if (!val) return (feedback.textContent = "");
-        try {
-          const res = await fetch(`/profile/ajax/validate-handle/?handle=${encodeURIComponent(val)}`);
-          const data = await res.json();
-          if (data.available) {
-            feedback.textContent = "✅ Handle available";
-            feedback.style.color = "green";
-          } else {
-            feedback.textContent = "❌ Handle already taken";
-            feedback.style.color = "red";
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      });
+  // ---- modal open/close (matches template/CSS) ----
+  const openBtn   = document.querySelector("[data-open='edit']");
+  const modal     = document.getElementById("edit-modal");
+  const closeBtn  = document.getElementById("close-edit");
+  const cancelBtn = document.getElementById("cancel-edit");
+
+  function open()  { modal?.classList.add("show"); }
+  function close() { modal?.classList.remove("show"); }
+
+  openBtn?.addEventListener("click", open);
+  closeBtn?.addEventListener("click", close);
+  cancelBtn?.addEventListener("click", close);
+  modal?.addEventListener("click", (e) => { if (e.target === modal) close(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+
+  // ---- AJAX: profile form (display_name, height_cm, weight_kg) ----
+  const form = document.getElementById("editForm");
+  const toast = document.getElementById("toast");
+  const errors = document.getElementById("edit-errors");
+
+  function showToast(msg) {
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 1600);
+  }
+
+  function setLiveError(msg) {
+    if (errors) errors.textContent = msg || "";
+  }
+
+  function setFieldInvalid(id, bad) {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute("aria-invalid", bad ? "true" : "false");
+  }
+
+  function updateMetric(field, value, unit) {
+    const box = document.querySelector(`.metrics .value[data-field="${field}"]`);
+    if (!box) return;
+    if (value === null || value === undefined || value === "") {
+      box.textContent = "—";
+    } else {
+      box.textContent = value;
+      if (unit) {
+        const span = document.createElement("span");
+        span.className = "unit";
+        span.textContent = ` ${unit}`;
+        box.appendChild(span);
+      }
     }
-  
-    // ========== 2. Inline Phone Update ==========
-    const phoneInput = document.querySelector("#id_phone_inline");
-    if (phoneInput) {
-      phoneInput.addEventListener("change", async () => {
-        const val = phoneInput.value.trim();
-        if (!val) return;
-        const csrf = document.querySelector("[name=csrfmiddlewaretoken]").value;
-        try {
-          const res = await fetch("/profile/ajax/update-phone/", {
-            method: "POST",
-            headers: {
-              "X-CSRFToken": csrf,
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({ phone: val }),
-          });
-          const data = await res.json();
-          alert(data.success ? "Phone updated ✅" : "Invalid phone ❌");
-        } catch (e) {
-          console.error(e);
+  }
+
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      setLiveError("");
+      setFieldInvalid("id_display_name", false);
+      setFieldInvalid("id_height_cm", false);
+      setFieldInvalid("id_weight_kg", false);
+
+      const submit = form.querySelector('button[type="submit"]');
+      const original = submit?.textContent;
+      if (submit) { submit.disabled = true; submit.textContent = "Saving..."; }
+
+      try {
+        const fd = new FormData(form);
+        const resp = await fetch(form.action, {
+          method: "POST",
+          headers: { "X-CSRFToken": csrftoken },
+          body: fd
+        });
+        const data = await resp.json();
+        if (!resp.ok || !data.success) {
+          const errs = data.errors || {};
+          if (errs.display_name) setFieldInvalid("id_display_name", true);
+          if (errs.height_cm)    setFieldInvalid("id_height_cm", true);
+          if (errs.weight_kg)    setFieldInvalid("id_weight_kg", true);
+          const first = Object.values(errs)[0]?.[0]?.message || "Could not save. Check your input.";
+          throw new Error(first);
         }
+
+        const u = data.updated || {};
+        const nameEl = document.querySelector(".display-name");
+        if (nameEl && u.display_name) nameEl.textContent = u.display_name;
+
+        updateMetric("height", u.height_cm, "cm");
+        updateMetric("weight", u.weight_kg, "kg");
+
+        close();
+        showToast("Profile updated");
+      } catch (err) {
+        console.error(err);
+        setLiveError(String(err.message || err));
+      } finally {
+        if (submit) { submit.disabled = false; submit.textContent = original; }
+      }
+    });
+  }
+
+  // ---- AJAX: avatar upload (instant preview, then upload) ----
+  const avatarFile = document.getElementById("avatar-file");
+  const avatarImg  = document.getElementById("avatar-img");
+
+  async function uploadAvatar(file) {
+    const fd = new FormData();
+    fd.append("avatar", file);
+    try {
+      const r = await fetch("/profile/avatar/", {
+        method: "POST",
+        headers: { "X-CSRFToken": csrftoken, "X-Requested-With": "XMLHttpRequest" },
+        body: fd
       });
+      const d = await r.json();
+      if (!r.ok || !d.success) throw new Error("Upload failed");
+      if (avatarImg && d.avatar_url) avatarImg.src = d.avatar_url;
+      showToast("Avatar updated");
+    } catch (e) {
+      console.error(e);
+      alert("Avatar upload failed. Try a smaller JPG/PNG/WebP (max 2 MB).");
     }
-  
-    // ========== 3. Avatar Upload ==========
-    const avatarForm = document.querySelector("#avatarForm");
-    if (avatarForm) {
-      avatarForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const formData = new FormData(avatarForm);
-        const csrf = document.querySelector("[name=csrfmiddlewaretoken]").value;
-        try {
-          const res = await fetch(avatarForm.action, {
-            method: "POST",
-            headers: { "X-CSRFToken": csrf },
-            body: formData,
-          });
-          const data = await res.json();
-          if (data.success) {
-            alert("Avatar updated!");
-            location.reload();
-          } else {
-            alert("Failed to upload avatar.");
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      });
-    }
+  }
+
+  avatarFile?.addEventListener("change", () => {
+    const f = avatarFile.files?.[0];
+    if (!f) return;
+    if (avatarImg) avatarImg.src = URL.createObjectURL(f); // instant preview
+    uploadAvatar(f);
   });
-  
+})();

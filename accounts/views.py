@@ -10,8 +10,14 @@ from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.decorators.http import require_GET
 from django.views.generic import DetailView, UpdateView, CreateView
+from django.views.decorators.csrf import csrf_protect
+from django.utils.decorators import method_decorator
 
-from .forms import ProfileEditForm, AvatarForm, HandleChangeForm, RegistrationForm
+from .forms import (
+    ProfileCardEditForm as ProfileEditForm,  # slim form (display_name, height, weight)
+    AvatarForm,
+    RegistrationForm,
+)
 
 User = get_user_model()
 
@@ -20,19 +26,33 @@ User = get_user_model()
 # -----------------------
 
 class ProfileView(LoginRequiredMixin, DetailView):
-    """Show the logged-in user's full profile (private fields included)."""
+    """Show the logged-in user's profile (card view)."""
     model = User
     template_name = "accounts/profile_view.html"
 
     def get_object(self, queryset=None):
         return self.request.user
 
+    def get_context_data(self, **kwargs):
+        """
+        Inject the slim edit form + avatar form so the modal can render
+        without a separate page.
+        """
+        ctx = super().get_context_data(**kwargs)
+        u = self.request.user
+        ctx["edit_form"] = ProfileEditForm(instance=u)
+        ctx["avatar_form"] = AvatarForm(instance=u)
+        return ctx
+
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
-    """Edit display_name, bio, gender, phone, birthdate, location, height, weight."""
+    """
+    Edit only the fields used by the new UI:
+    display_name, height_cm, weight_kg (avatar handled separately).
+    """
     model = User
     form_class = ProfileEditForm
-    template_name = "accounts/profile_edit.html"
+    template_name = "accounts/profile_edit.html"  # keeps fallback page if needed
 
     def get_object(self, queryset=None):
         return self.request.user
@@ -60,56 +80,58 @@ class AvatarUpdateView(LoginRequiredMixin, View):
             return JsonResponse({"success": False, "errors": errors}, status=400)
         return redirect(reverse("profile_edit"))
 
+
+@method_decorator(csrf_protect, name="dispatch")
+class ProfileUpdateAjax(LoginRequiredMixin, View):
+    def post(self, request: HttpRequest, *args, **kwargs) -> JsonResponse:
+        user = request.user
+        form = ProfileEditForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({
+                "success": True,
+                "updated": {
+                    "display_name": user.display_name or user.username,
+                    "height_cm": user.height_cm,
+                    "weight_kg": float(user.weight_kg) if user.weight_kg is not None else None,
+                }
+            })
+        return JsonResponse({"success": False, "errors": form.errors.get_json_data()}, status=400)
+
 # -----------------------
 # Public view
 # -----------------------
 
 class PublicProfileView(DetailView):
-    """Public profile by handle (no private fields)."""
+    """
+    Public profile by handle (legacy). Kept temporarily to avoid breaking links.
+    Currently visually identical to the private card per product decision.
+    """
     model = User
     template_name = "accounts/public_profile.html"
     slug_field = "handle"
     slug_url_kwarg = "handle"
 
 # -----------------------
-# AJAX endpoints
+# Deprecated AJAX endpoints (kept as safe stubs)
 # -----------------------
 
 @require_GET
 def validate_handle(request: HttpRequest) -> JsonResponse:
     """
-    Check if a handle is available.
-    GET /profile/ajax/validate-handle/?handle=foo
+    Deprecated: handle is no longer editable/required in the new UI.
+    Keeping a stub to avoid 404 if old JS still calls it while we refactor.
     """
-    handle = (request.GET.get("handle") or "").strip().lower()
-    if not handle:
-        return JsonResponse({"valid": False, "error": "No handle provided."}, status=400)
-
-    temp_form = HandleChangeForm(
-        data={"handle": handle},
-        instance=request.user if request.user.is_authenticated else None,
-    )
-    if temp_form.is_valid():
-        return JsonResponse({"valid": True})
-    return JsonResponse({"valid": False, "errors": temp_form.errors.get_json_data()}, status=400)
+    return JsonResponse({"valid": False, "error": "Handle validation is deprecated."}, status=410)
 
 
 class UpdatePhoneAjax(LoginRequiredMixin, View):
     """
-    Update phone via AJAX.
-    POST /profile/ajax/update-phone/  (form-data: phone=+62812...)
+    Deprecated: phone is no longer part of the profile.
+    Kept as a 410 stub to avoid breaking old calls during the transition.
     """
     def post(self, request: HttpRequest, *args, **kwargs) -> JsonResponse:
-        phone = (request.POST.get("phone") or "").strip()
-        form = ProfileEditForm(
-            {"display_name": request.user.display_name, "phone": phone},
-            instance=request.user,
-        )
-        if form.is_valid():
-            request.user.phone = form.cleaned_data["phone"]
-            request.user.save(update_fields=["phone"])
-            return JsonResponse({"success": True, "phone": request.user.phone})
-        return JsonResponse({"success": False, "errors": form.errors.get_json_data()}, status=400)
+        return JsonResponse({"success": False, "error": "Phone update is deprecated."}, status=410)
 
 # -----------------------
 # Auth views
@@ -128,14 +150,11 @@ class RegisterView(CreateView):
     template_name = "registration/register.html"
     success_url = reverse_lazy("login")
 
+
 @login_required
 def post_login(request: HttpRequest):
     """
-    Smart redirect after login:
-    If profile is incomplete (missing height or weight), go to edit (onboarding),
-    else go to private profile view.
+    After login, always go to the profile page.
+    (User can open the edit modal from the button on that page.)
     """
-    u = request.user
-    if not getattr(u, "height_cm", None) or not getattr(u, "weight_kg", None):
-        return redirect("profile_edit")
     return redirect("profile_view")
