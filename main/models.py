@@ -1,10 +1,14 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.utils import timezone
 import uuid
 
 class PersonalGoal(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="personal_goals",
+    )
     title = models.CharField(max_length=200)
     date = models.DateField()
     is_completed = models.BooleanField(default=False)
@@ -15,6 +19,7 @@ class PersonalGoal(models.Model):
         indexes = [
             models.Index(fields=["user", "date"]),
         ]
+
     def __str__(self):
         return f"{self.title} ({self.date})"
 

@@ -1,0 +1,26 @@
+<article class="bg-white border rounded-xl overflow-hidden hover:shadow-sm transition">
+  <img src="{{ item.image_url|default:'#' }}" alt="" class="w-full h-40 object-cover">
+  <div class="p-4 space-y-1">
+    <div class="flex items-center justify-between text-xs text-gray-500">
+      <span class="px-2 py-0.5 bg-gray-100 rounded">{{ item.category|title|replace:"_"," " }}</span>
+      <span>
+        {% with free=item.capacity|add:-item.booked_count %}
+          {% if free|default:0 <= 0 %}<span class="text-red-600">Full</span>
+          {% else %}{{ free }} spots left{% endif %}
+        {% endwith %}
+      </span>
+    </div>
+    <h3 class="font-semibold text-sm line-clamp-1">{{ item.name }}</h3>
+    <p class="text-xs text-gray-600 line-clamp-1">{{ item.instructor }} • {{ item.location_city }}</p>
+    <p class="text-sm font-medium">Rp {{ item.price|floatformat:0 }}</p>
+    <p class="text-xs text-gray-500">
+      {{ item.starts_at|date:"D, M j, H:i" }}
+    </p>
+    <div class="pt-2 flex gap-2">
+      <a class="text-sm px-3 py-1.5 border rounded-lg hover:bg-gray-50"
+         href="/classes/{{ item.id }}/">Details</a>
+      <a class="text-sm px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+         href="/checkout?class_id={{ item.id }}">Book</a>
+    </div>
+  </div>
+</article>

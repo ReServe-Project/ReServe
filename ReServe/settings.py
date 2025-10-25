@@ -33,8 +33,11 @@ DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "khayru-rafa-reserve.pbp.cs.ui.ac.id"]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://khayru-rafa-reserve.pbp.cs.ui.ac.id/"
+    "https://khayru-rafa-reserve.pbp.cs.ui.ac.id"
 ]
+
+AUTH_USER_MODEL = 'accounts.User'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -44,7 +47,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'main',
+    'home_search',
+    'accounts',
     'blog',
 ]
 
@@ -124,7 +130,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -136,17 +141,25 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Auth redirects
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "post_login"
+LOGOUT_REDIRECT_URL = "login"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 LOGIN_URL = 'main:login'
 LOGIN_REDIRECT_URL = 'blog:main_blog'
