@@ -5,29 +5,37 @@
 {% block content %}
 <div class="min-h-screen bg-[#F7F4EC] py-10">
 
-  <!-- Header -->
-  <header class="max-w-3xl mx-auto text-center px-4">
-    <h1 class="font-head font-extrabold md:text-5xl text-[#434162]">
-      Share Your <span class="text-[#F1642E]">Blogs</span> With Us!
-    </h1>
-    <p class="font-sub font-semibold mt-2 text-[#505050]">The Latest Buzz</p>
-
   <!-- Header Image -->
-<div class="mt-4 relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen">
-  <img
-    src="{% static 'images/blog_header.png' %}"
-    alt="Blog header"
-    class="block w-screen h-56 md:h-72 lg:h-80 object-cover"
-  />
-</div>
-
-    <!-- OPEN MODAL BUTTON -->
-    <button id="openCreateBtn"
-      type="button"
-      class="inline-flex items-center justify-center mt-6 px-5 py-2 rounded-full bg-[#504E76] text-white text-sm shadow hover:bg-[#35344F]">
+  <div class="mt-0 relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen">
+    <img
+      src="{% static 'images/blog_header.png' %}"
+      alt="Blog header"
+      class="mt-0 w-screen object-cover"
+    />
+    <div class="mt-10 absolute top-20 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+      <!-- Header -->
+      <header class="max-w-3xl mx-auto text-center px-4">
+        <h1 class="font-head font-extrabold md:text-5xl text-[#434162]">
+          Share Your <span class="text-[#F1642E]">Blogs</span> With Us!
+        </h1>
+        <p class="font-sub font-semibold mt-2 text-[#505050]">The Latest Buzz</p>
+      </header>
+    </div>
+      <!-- CREATE BUTTON (desktop: overlaps image, below title) -->
+    <button type="button"
+            class="font-sub openCreateBtn hidden md:inline-flex absolute left-1/2 -translate-x-1/2 top-[70%] items-center justify-center px-6 py-3 rounded-lg bg-[#504E76] text-white text-sm shadow-lg hover:bg-[#35344F]">
       + Create Now!
     </button>
-  </header>
+
+  </div>
+
+
+  <!-- Mobile create button (visible only on small screens) -->
+  <div class="md:hidden flex justify-center mt-6">
+    <button type="button" class="openCreateBtn inline-flex items-center justify-center px-5 py-2 rounded-full bg-[#504E76] text-white text-sm shadow hover:bg-[#35344F]">
+      + Create Now!
+    </button>
+  </div>
 
   {% if not blog_list %}
     <p class="text-center text-slate-500 mt-16">No data available in Blog.</p>
@@ -66,8 +74,8 @@
 
         <!-- bottom-right arrow button -->
         <a aria-label="Read {{ blog.title }}" href="{% url 'blog:blog_details' blog.id %}"
-           class="absolute -bottom-6 right-6 inline-flex h-16 w-16 items-center justify-center
-                  rounded-full bg-[#434162] text-white shadow-lg ring-4 ring-white
+           class="absolute -bottom-6 right-3 inline-flex h-16 w-16 items-center justify-center
+                  rounded-full bg-[#434162] text-white shadow-xl ring-4 ring-white
                   hover:bg-[#353357]">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-7 w-7 fill-current">
             <path d="M7 7a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v9a1 1 0 1 1-2 0V9.414l-9.293 9.293a1 1 0 0 1-1.414-1.414L14.586 8H8a1 1 0 0 1-1-1Z"/>
@@ -142,12 +150,12 @@
 document.addEventListener('DOMContentLoaded', function () {
   const modal     = document.getElementById('createModal');
   const backdrop  = document.getElementById('modalBackdrop');
-  const openBtn   = document.getElementById('openCreateBtn');
+  // support multiple open buttons (desktop overlap + mobile)
+  const openBtns  = Array.from(document.querySelectorAll('.openCreateBtn'));
   const cancelBtn = document.getElementById('cancelCreateBtn');
   const form      = document.getElementById('createBlogForm');
   const errorBox  = document.getElementById('formErrors');
-
-  if (!modal || !openBtn) return;
+  if (!modal || openBtns.length === 0) return;
 
   const openModal  = () => modal.classList.remove('hidden');
   const closeModal = () => {
@@ -155,7 +163,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (errorBox) { errorBox.classList.add('hidden'); errorBox.textContent = ''; }
   };
 
-  openBtn.addEventListener('click', openModal);
+  // attach listeners to every open button (desktop + mobile)
+  openBtns.forEach(b => b.addEventListener('click', openModal));
   backdrop?.addEventListener('click', closeModal);
   cancelBtn?.addEventListener('click', closeModal);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
