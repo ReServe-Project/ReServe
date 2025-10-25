@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}{{ c.name }}{% endblock %}
+
+{% block content %}
+<section class="max-w-4xl mx-auto px-6 md:px-8 py-10">
+  <div class="bg-white rounded-2xl shadow border border-black/10 overflow-hidden">
+
+    {% if c.image_url %}
+      <img src="{{ c.image_url }}" alt="{{ c.name }}" class="w-full h-[420px] object-cover">
+    {% endif %}
+
+    <div class="p-6 md:p-8">
+      <h1 class="text-3xl font-extrabold text-[#1B1C22]">{{ c.name }}</h1>
+      <p class="mt-1 text-[#575757]">Rp {{ c.price|intcomma }}</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div>
+          <p class="text-sm font-semibold text-[#575757]">Category:</p>
+          <p>{{ c.get_category_display }}</p>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-[#575757]">Instructor:</p>
+          <p>{% if c.owner %}{{ c.owner.get_full_name|default:c.owner.username }}{% else %}—{% endif %}</p>
+        </div>
+
+        <div>
+          <p class="text-sm font-semibold text-[#575757]">Date &amp; Time:</p>
+          <p>{% if c.datetime %}{{ c.datetime|date:"D, d M Y · H:i" }}{% else %}—{% endif %}</p>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-[#575757]">Location:</p>
+          <p>{{ c.location|default:"—" }}</p>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <p class="text-sm font-semibold text-[#575757]">Description</p>
+        <p class="mt-1 leading-relaxed">
+          {% if c.description %}{{ c.description }}{% else %}<span class="text-[#8c8c8c]">No description yet.</span>{% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+

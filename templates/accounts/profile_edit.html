@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block meta %}
+<title>Edit Profile • ReServe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'accounts/css/profile.css' %}">
+{% endblock meta %}
+
+{% block content %}
+<div class="backdrop"></div>
+
+<div class="container-narrow">
+  <div class="card">
+    <div class="profile-header">
+      <div class="avatar-wrap">
+        <img src="{{ user.avatar.url|default:'/static/accounts/img/avatar-placeholder.png' }}" alt="Avatar">
+      </div>
+      <div>
+        <div class="name-row">
+          <h1 class="display-name">{{ user.display_name|default:user.username }}</h1>
+          {% if user.handle %}<span class="handle">@{{ user.handle }}</span>{% endif %}
+          {% if user.get_role_display %}<span class="role-chip">{{ user.get_role_display }}</span>{% endif %}
+        </div>
+        <div class="meta">
+          <div class="item">Editing your profile</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fallback form uses current form class on the view -->
+    <form method="post" enctype="multipart/form-data" class="form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div class="field">
+        <label for="{{ form.display_name.id_for_label }}">Display name</label>
+        {{ form.display_name }}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.height_cm.id_for_label }}">Height (cm)</label>
+        {{ form.height_cm }}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.weight_kg.id_for_label }}">Weight (kg)</label>
+        {{ form.weight_kg }}
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" type="submit">Save changes</button>
+        <a class="btn btn-outline" href="{% url 'profile_view' %}">Cancel</a>
+      </div>
+    </form>
+
+    <div class="section center">
+      <h3>Change Avatar</h3>
+      <form id="avatarForm" method="post" enctype="multipart/form-data" action="{% url 'profile_avatar_update' %}">
+        {% csrf_token %}
+        <input type="file" name="avatar" accept="image/*" class="mt-3">
+        <div class="mt-3">
+          <button class="btn btn-outline" type="submit">Upload</button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script src="{% static 'accounts/js/profile.js' %}"></script>
+{% endblock content %}

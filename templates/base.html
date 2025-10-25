@@ -2,12 +2,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    {% block meta %} {% endblock meta %}
-</head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}ReServe{% endblock %}</title>
 
-<body>
-    {% block content %} {% endblock content %}
+  <!-- Load Tailwind once for the whole site -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Allow pages to inject extra <head> assets (fonts, page-specific CSS like auth.css, profile.css, etc.) -->
+  {% block meta %}{% endblock %}
+</head>
+<body class="min-h-screen bg-[#FFF8EC] text-[#1E1E1E]">
+  {% include 'navbar.html' %}
+  <main class="relative">
+    {% block content %}{% endblock %}
+  </main>
 </body>
 </html>
