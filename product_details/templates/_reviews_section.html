@@ -12,9 +12,9 @@
 
       <!-- Checkout Button (Members only) -->
       {% if user.is_authenticated and user.role == "member" %}
-        <a href="/checkout?class_id={{ c.id }}"
-           class="inline-block px-6 py-2.5 rounded-2xl bg-[#f07a3b] text-white font-semibold shadow-sm hover:brightness-110">
-           Checkout
+        <a href="{% url 'checkout:checkout' class_id=c.id %}"
+          class="inline-block px-6 py-2.5 rounded-2xl bg-[#f07a3b] text-white font-semibold shadow-sm hover:brightness-110">
+            Checkout
         </a>
       {% endif %}
     </div>
