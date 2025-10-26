@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'home_search',
     'accounts',
     'product_details',
-
+    'checkout',
 ]
 
 MIDDLEWARE = [

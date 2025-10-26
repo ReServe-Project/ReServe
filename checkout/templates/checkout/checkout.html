@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %} {# FIXED: Added load static tag for images and CSS #}
+
+{# FIXED: Added meta block for title and CSS #}
+{% block meta %}
+    <title>Checkout</title>
+    <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+{% endblock meta %}
+
+
+{% block content %} {# FIXED: All content must be inside a block #}
+
+<div class="checkout-container">
+    <a href="javascript:history.back()" class="back-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </a>
+    <h1 class="checkout-title">Checkout</h1>
+
+    <div class="checkout-content">
+        <div class="booking-details-card">
+            <form method="POST" id="checkout_form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="class_name">Class Name</label>
+                    <input type="text" id="class_name" value="{{ class.class_name }}" readonly class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.full_name.id_for_label }}">Full Name</label>
+                    {{ form.full_name }}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half-width">
+                        <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                        {{ form.phone_number }}
+                    </div>
+                    <div class="form-group half-width">
+                        <label for="{{ form.email.id_for_label }}">Email</label>
+                        {{ form.email }}
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="payment-card">
+            <h2>QRIS Payment Only</h2>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="agree_qris" name="agree_qris">
+                <label for="agree_qris">I agree to pay using QRIS</label>
+            </div>
+            
+            <div id="qris_details" style="display: none;">
+                <div class="qris-image-placeholder">
+                    <img src="{% static 'images/my_qris.png' %}" alt="QRIS Code" style="width: 150px; height: 150px;">
+                </div>
+                <button type="submit" form="checkout_form" class="confirm-button">Confirm Checkout</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const qrisCheckbox = document.getElementById('agree_qris');
+        const qrisDetails = document.getElementById('qris_details');
+
+        qrisCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                qrisDetails.style.display = 'block';
+            } else {
+                qrisDetails.style.display = 'none';
+            }
+        });
+    });
+</script>
+
+{% endblock content %}
