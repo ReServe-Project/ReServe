@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block meta %}
+<title>Login • ReServe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-grid">
+
+  <!-- Left: Track visual -->
+  <section class="track-wrap">
+    <div class="logo-pill">
+      <img src="{% static 'accounts/img/logo.png' %}" alt="ReServe">
+    </div>
+    <!-- same trick as register: inline bg so VS Code stops whining -->
+    <div class="track-hero" style="background-image:url('{% static 'accounts/img/track-bg.jpg' %}')"></div>  
+  </section>
+
+  <!-- Right: form side -->
+  <section class="form-side">
+    <div class="form-stack">
+      <h1>Login</h1>
+
+      <form method="post" class="form" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        {% for field in form.visible_fields %}
+          <div class="field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <div class="error-inline">{{ field.errors|join:", " }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <button class="primary-btn" type="submit">Login</button>
+
+        <p class="small-note">
+          Don’t have an account? <a href="{% url 'register' %}">Register now</a>
+        </p>
+      </form>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

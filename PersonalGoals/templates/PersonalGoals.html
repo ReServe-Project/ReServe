@@ -12,12 +12,12 @@
       <!-- LEFT: Calendar + prompt -->
       <div class="w-full">
         <!-- orange prompt pill -->
-        <div class="inline-block rounded-xl bg-[#E86C2A] text-white font-semibold px-6 py-3 shadow-sm mb-6" style="width: 436px;">
+        <div class="inline-flex items-center justify-center text-center rounded-xl bg-[#E86C2A] text-white font-semibold px-6 py-3 shadow-sm mb-6" style="width: 436px;">
           Select a date to set your goals!
         </div>
 
         <!-- Calendar card -->
-        <div class="rounded-xl border border-[#E86C2A] bg-[#FFF9F0] p-6" style="width: 436px; height: 439px;">
+        <div class="rounded-xl border border-[#E86C2A] bg-white p-6" style="width: 436px; height: 439px;">
           <!-- header -->
           <div class="flex items-center justify-between">
             <button id="prevMonth"
@@ -28,7 +28,7 @@
             </button>
 
             <div class="text-center">
-              <h2 id="monthYear" class="text-xl font-bold text-[#2E2B41]">{{ month_name }} {{ year }}</h2>
+              <h2 id="monthYear" class="text-xl font-extrabold text-[#E86C2A]">{{ month_name }} {{ year }}</h2>
             </div>
 
             <button id="nextMonth"
@@ -41,13 +41,13 @@
 
           <!-- days of week -->
           <div class="grid grid-cols-7 gap-1 mt-6">
-            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">Su</div>
-            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">Mo</div>
-            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">Tu</div>
-            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">We</div>
-            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">Th</div>
-            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">Fr</div>
-            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">Sa</div>
+            <div class="text-center text-sm font-extrabold text-[#6B6B83] py-2">Su</div>
+            <div class="text-center text-sm font-extrabold text-[#6B6B83] py-2">Mo</div>
+            <div class="text-center text-sm font-extrabold text-[#6B6B83] py-2">Tu</div>
+            <div class="text-center text-sm font-extrabold text-[#6B6B83] py-2">We</div>
+            <div class="text-center text-sm font-extrabold text-[#6B6B83] py-2">Th</div>
+            <div class="text-center text-sm font-extrabold text-[#6B6B83] py-2">Fr</div>
+            <div class="text-center text-sm font-extrabold text-[#6B6B83] py-2">Sa</div>
           </div>
 
           <!-- calendar grid -->
@@ -58,8 +58,8 @@
                   <div class="h-10"></div>
                 {% else %}
                   <button
-                    class="calendar-day h-10 text-sm rounded-md transition
-                    {% if day == today_day and month == current_month and year == current_year %} bg-[#E86C2A] text-white {% else %} text-[#2E2B41] hover:bg-gray-100 {% endif %}"
+                    class="calendar-day h-12 text-sm rounded-md transition
+                    {% if day == today_day and month == current_month and year == current_year %} bg-[#E86C2A] text-white {% else %} text-[#E86C2A] hover:bg-gray-100 {% endif %}"
                     data-date="{{ year }}-{{ month|stringformat:'02d' }}-{{ day|stringformat:'02d' }}"
                     data-day="{{ day }}">
                     {{ day }}
@@ -75,10 +75,20 @@
       <div class="relative w-full">
           <!-- avatar overlapping the right corner -->
           <div class="absolute z-20" style="right: 480px; top: -0px;">
-            <div class="w-[109px] h-[109px] rounded-full overflow-hidden ring-4 ring-white bg-gray-300 flex items-center justify-center">
-              <svg class="w-16 h-16 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-              </svg>
+            <div class="w-[109px] h-[109px] rounded-full overflow-hidden ring-4 ring-[#E86C2A] bg-gray-200">
+              {% if user.is_authenticated and user.avatar %}
+                <img
+                  src="{{ user.avatar.url }}"
+                  alt="{{ user.display_label|default:user.username }}'s avatar"
+                  class="w-full h-full object-cover"
+                />
+              {% else %}
+                <img
+                  src="{{ MEDIA_URL }}avatars/default.png"
+                  alt="Default avatar"
+                  class="w-full h-full object-cover"
+                />
+              {% endif %}
             </div>
           </div>
 
@@ -92,7 +102,7 @@
         <!-- dark card with orange border -->
         <div class="relative rounded-2xl bg-[#3F3A59] border-2 border-[#E86C2A] p-6 pt-8 pb-24" style="width: 794px; height: 593px;">
           <!-- scrollable list, panel fixed height -->
-          <div id="goalsList" class="overflow-y-auto pr-1 space-y-3 flex flex-col items-center mx-auto" style="width: 664px; height: 414px;">
+          <div id="goalsList" class="overflow-y-auto pr-1 space-y-3 flex flex-col items-center mx-auto mt-8" style="width: 742px; height: 414px;">
             {% for date_str, goals in goals_by_date.items %}
               {% for goal in goals %}
                 <div class="goal-item bg-[#EFEDE8] rounded-xl px-4 py-3 flex items-center" style="width: 664px; height: 61px;">
@@ -100,7 +110,7 @@
                          class="goal-checkbox w-5 h-5 rounded border-gray-300 text-[#3F3A59] focus:ring-[#3F3A59]"
                          {% if goal.is_completed %}checked{% endif %}
                          data-goal-id="{{ goal.id }}">
-                  <span class="goal-title ml-3 text-[#2E2B41] text-[15px] {% if goal.is_completed %}line-through text-gray-500{% endif %}">
+                  <span class="goal-title ml-3 text-[#2E2B41] text-[20px] {% if goal.is_completed %}line-through text-gray-500{% endif %}">
                     {{ goal.title }}
                   </span>
                 </div>
@@ -118,7 +128,7 @@
                 <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12M6 12h12"/>
                 </svg>
-                + Add Goal
+                Add Goal
               </button>
             </div>
           </div>
@@ -268,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const isSelected = dateStr === selectedDate;
           const cls = isSelected ? 'bg-[#E86C2A] text-white' : 'text-[#2E2B41] hover:bg-gray-100';
           grid.innerHTML += `
-            <button class="calendar-day h-10 text-sm rounded-md transition ${cls}"
+            <button class="calendar-day h-12 text-sm rounded-md transition ${cls}"
                     data-date="${dateStr}" data-day="${day}">
               ${day}
             </button>`;
@@ -302,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
       checkbox.setAttribute('data-goal-id', g.id);
       
       const span = document.createElement('span');
-      span.className = `goal-title ml-3 text-[#2E2B41] text-[15px] ${g.is_completed ? 'line-through text-gray-500' : ''}`;
+      span.className = `goal-title ml-3 text-[#2E2B41] text-[20px] ${g.is_completed ? 'line-through text-gray-500' : ''}`;
       span.textContent = g.title;
       
       row.appendChild(checkbox);

@@ -7,6 +7,9 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 # Create your views here.
+def show_main(request):
+    return redirect(reverse("home_search:home"))
+
 def register(request):
     form = UserCreationForm()
     if request.method == "POST":
@@ -25,7 +28,7 @@ def login_user(request):
       if form.is_valid():
         user = form.get_user()
         login(request, user)
-        response = HttpResponseRedirect(reverse("main:show_main"))
+        response = HttpResponseRedirect(reverse("home_search:home"))
         response.set_cookie('last_login', str(datetime.datetime.now()))
         return response
 
