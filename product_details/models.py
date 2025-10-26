@@ -17,7 +17,6 @@ class ClassDetails(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     class_name = models.CharField(max_length=200)
     instructor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='classes_teaching')
-    is_by_appointment = models.BooleanField(default=False)
     date_time = models.DateTimeField(null=True, blank=True)
     location = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=0)
@@ -25,15 +24,13 @@ class ClassDetails(models.Model):
     image = models.ImageField(upload_to='class_images/', null=True, blank=True)
     
     def get_schedule_display(self):
-        if self.is_by_appointment:
-            return "By appointment"
-        elif self.date_time:
+        if self.date_time:
             return self.date_time.strftime("%Y-%m-%d %H:%M")
         return "Schedule not set"
     
     def average_rating(self):
         reviews = self.reviews.all()
-        if reviews:
+        if reviews.exists():
             return round(sum(review.rating for review in reviews) / len(reviews), 1)
         return 0
     

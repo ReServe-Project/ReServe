@@ -51,10 +51,9 @@ INSTALLED_APPS = [
     'main',
     'home_search',
     'accounts',
+    'product_details',
 
 ]
-
-# AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

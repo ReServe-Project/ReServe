@@ -4,7 +4,7 @@ from .models import ClassDetails, Review
 @admin.register(ClassDetails)
 class ClassDetailsAdmin(admin.ModelAdmin):
     list_display = ['class_name', 'category', 'instructor', 'price']
-    list_filter = ['category', 'is_by_appointment']
+    list_filter = ['category']
     search_fields = ['class_name', 'instructor__username']
 
 @admin.register(Review)
