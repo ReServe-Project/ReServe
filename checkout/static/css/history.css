@@ -226,3 +226,10 @@
     color: #991B1B; /* Dark red */
     border: 1px solid #FECACA;
 }
+
+.card-user-info {
+    margin: 5px 0 0 0; /* Add a little space above, remove default bottom margin */
+    font-size: 0.875rem; /* Same size as date/location */
+    color: #666;        /* Same color as date/location */
+    font-weight: normal; /* Ensure it's not bold if h3 styling cascades */
+}
