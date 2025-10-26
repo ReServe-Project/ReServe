@@ -3,7 +3,6 @@
 
 {% block meta %}
     <title>Booking History</title>
-    {# Link to a new CSS file we will create for this page #}
     <link rel="stylesheet" href="{% static 'css/history.css' %}">
 {% endblock meta %}
 
@@ -27,38 +26,40 @@
 
     <div class="history-layout">
         <div class="main-column">
+
+            {# ----- START OF UPDATED LOOP STRUCTURE ----- #}
             {% for booking in bookings %}
                 <div class="booking-card">
                     <div class="card-image">
-                        {# --- FIX 1: Check the correct image field --- #}
                         {% if booking.class_booked.image_url %}
-                            {# --- FIX 2: Use the correct image field and name field --- #}
                             <img src="{{ booking.class_booked.image_url }}" alt="{{ booking.class_booked.name }}">
                         {% else %}
-                            <div class="image-placeholder"></div>
+                            <div class="image-placeholder">No Image</div> {# Placeholder text #}
                         {% endif %}
                     </div>
-                    <div class="card-title">
-                        {# --- FIX 3: Use the correct name field --- #}
-                        <h3>{{ booking.class_booked.name }}</h3>
+                    <div class="card-content">
+                        <h3 class="card-title">{{ booking.class_booked.name }}</h3>
                     </div>
-                    <div class="card-details">
-                        {# NOTE: Using the class date/time, not the booking date #}
-                        <p>{{ booking.class_booked.datetime|date:"d F Y H.i" }}</p> {# Assuming the field is named datetime #}
-                        <p>{{ booking.class_booked.location }}</p>
-                    </div>
-                    <div class="card-actions">
-                        <form action="{% url 'checkout:delete_booking' booking.id %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this booking?');">
-                            {% csrf_token %}
-                            <button type="submit" class="btn-delete">Delete</button>
-                        </form>
-                        {# The Edit button is just a placeholder for now #}
-                        <button class="btn-edit">Edit</button>
+                    <div class="card-info-actions">
+                         <div class="card-details">
+                            <p class="card-date">{{ booking.class_booked.datetime|date:"d F Y H.i" }}</p>
+                            <p class="card-location">{{ booking.class_booked.location }}</p>
+                        </div>
+                        <div class="card-actions">
+                            <form action="{% url 'checkout:delete_booking' booking.id %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this booking?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-delete">Delete</button> {# Added btn class #}
+                            </form>
+                            {# Add specific class for Edit button styling #}
+                            <button class="btn btn-edit">Edit</button> {# Added btn class #}
+                        </div>
                     </div>
                 </div>
             {% empty %}
                 <p>You have no booking history.</p>
             {% endfor %}
+            {# ----- END OF UPDATED LOOP STRUCTURE ----- #}
+
         </div>
 
         <div class="sidebar-column">

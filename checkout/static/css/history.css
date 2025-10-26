@@ -1,164 +1,220 @@
 /* checkout/static/css/history.css */
 
+/* Overall container */
 .history-container {
-    width: 90%;
-    max-width: 1200px;
+    max-width: 1000px; /* Adjust max-width as needed */
     margin: 40px auto;
-    font-family: Arial, sans-serif;
+    padding: 30px;
+    background-color: #ffffff; /* White background for the main content area */
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
 }
 
+/* Header */
 .history-header {
     display: flex;
     align-items: center;
+    gap: 16px;
     margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
 }
 
 .back-button-circle {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
+    border: 1px solid #E0E0E0;
     background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     color: #333;
     text-decoration: none;
-    margin-right: 20px;
+    transition: background-color 0.2s;
+}
+
+.back-button-circle:hover {
+    background-color: #f5f5f5;
 }
 
 .history-header h1 {
-    font-size: 2.5em;
+    font-size: 2rem; /* Larger title */
+    font-weight: 700; /* Bold title */
     color: #333;
 }
 
+/* Layout: Main column and sidebar */
 .history-layout {
     display: flex;
     gap: 30px;
 }
 
 .main-column {
-    flex: 3;
+    flex: 3; /* Main column takes more space */
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 20px; /* Space between cards */
 }
 
 .sidebar-column {
-    flex: 1;
+    flex: 1; /* Sidebar takes less space */
 }
 
+/* Individual Booking Card */
 .booking-card {
-    display: grid;
-    grid-template-columns: 100px 2fr 1.5fr 1fr;
-    align-items: center;
+    display: flex;
+    align-items: center; /* Vertically align items */
     gap: 20px;
-    background-color: #fff;
+    background-color: #f9f9f9; /* Light grey background for card */
     padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    border-radius: 8px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .card-image img {
-    width: 100px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 8px;
+    width: 100px; /* Adjust image size */
+    height: 75px;
+    object-fit: cover; /* Ensure image covers the area nicely */
+    border-radius: 6px;
+    display: block;
 }
 .image-placeholder {
     width: 100px;
-    height: 80px;
-    background-color: #eee;
-    border-radius: 8px;
+    height: 75px;
+    background-color: #e0e0e0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 0.8em;
 }
 
-.card-title h3 {
-    font-size: 1.2em;
-    font-weight: bold;
+
+.card-content {
+    flex-grow: 1; /* Allows title to take available space */
+}
+
+.card-title {
+    font-size: 1.25rem; /* Larger title */
+    font-weight: 600; /* Bolder title */
+    color: #333;
+    margin: 0; /* Remove default margin */
+}
+
+.card-info-actions {
+    display: flex;
+    flex-direction: column; /* Stack details and actions vertically */
+    align-items: flex-end; /* Align items to the right */
+    gap: 10px;
+    margin-left: auto; /* Pushes this block to the far right */
+    text-align: right; /* Align text inside to the right */
+}
+
+.card-details p {
     margin: 0;
-}
-
-.card-details {
-    font-size: 0.9em;
+    font-size: 0.875rem; /* Smaller text for details */
     color: #666;
 }
-.card-details p {
-    margin: 4px 0;
+.card-date {
+    font-weight: 500;
+}
+.card-location {
+    font-size: 0.8rem;
 }
 
 .card-actions {
     display: flex;
-    gap: 10px;
+    gap: 10px; /* Space between buttons */
 }
 
-.card-actions button, .card-actions .btn-delete {
-    padding: 8px 16px;
+/* General Button Styles */
+.btn {
+    padding: 6px 12px;
     border: none;
-    border-radius: 6px;
-    font-size: 0.9em;
-    font-weight: bold;
+    border-radius: 5px;
+    font-size: 0.875rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: transform 0.2s;
-}
-.card-actions button:hover {
-    transform: translateY(-2px);
+    transition: background-color 0.2s, opacity 0.2s;
+    color: white; /* Common text color */
 }
 
 .btn-delete {
-    background-color: #FF4D4D;
-    color: white;
+    background-color: #EF4444; /* Red */
+}
+.btn-delete:hover {
+    background-color: #DC2626; /* Darker Red */
 }
 
 .btn-edit {
-    background-color: #4A90E2;
-    color: white;
+    background-color: #3B82F6; /* Blue */
+}
+.btn-edit:hover {
+    background-color: #2563EB; /* Darker Blue */
 }
 
+/* Sidebar "Explore More" Card */
 .explore-card {
     background-color: #fff;
     padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    border-radius: 8px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     text-align: center;
 }
 
 .explore-card img {
     width: 100%;
-    height: 150px;
+    height: 120px; /* Adjust height */
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 6px;
     margin-bottom: 15px;
 }
 
 .explore-card h3 {
-    font-size: 1.2em;
-    margin-bottom: 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
 }
 
 .btn-explore {
-    display: inline-block;
-    background-color: #F5A623;
+    display: inline-block; /* Allows padding and centering */
+    background-color: #F97316; /* Orange */
     color: white;
-    padding: 12px 30px;
-    border-radius: 8px;
+    padding: 10px 20px;
+    border-radius: 20px; /* Pill shape */
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 500;
     transition: background-color 0.2s;
 }
+
 .btn-explore:hover {
-    background-color: #d9931f;
+    background-color: #EA580C; /* Darker Orange */
 }
 
-/* For displaying messages */
+/* Message Styling (Optional) */
 .messages {
-    list-style-type: none;
+    list-style: none;
     padding: 0;
     margin-bottom: 20px;
 }
-.messages .success {
-    padding: 15px;
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-    border-radius: 5px;
+.messages li {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+.messages li.success {
+    background-color: #D1FAE5; /* Light green */
+    color: #065F46; /* Dark green */
+    border: 1px solid #A7F3D0;
+}
+.messages li.error {
+    background-color: #FEE2E2; /* Light red */
+    color: #991B1B; /* Dark red */
+    border: 1px solid #FECACA;
 }
