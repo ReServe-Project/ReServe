@@ -1,24 +1,12 @@
-{% load static %}
-
-<!-- Reviews Grid -->
-{% if reviews %}
-<div class="grid md:grid-cols-2 gap-4">
-  {% for review in reviews %}
-  <div class="bg-[#fff9e6] rounded-xl p-4 shadow-sm flex gap-3 items-start">
-    <!-- User Avatar -->
-    <img src="{{ review.user.avatar.url }}" 
-         alt="{{ review.user.display_name }}" 
-         class="w-12 h-12 rounded-full object-cover">
-
-    <div class="flex-1">
-      <div class="flex justify-between items-center">
-        <h3 class="font-semibold">{{ review.user.display_name }}</h3>
-
-        <!-- Star Rating -->
-        <div class="text-yellow-400">
-          {% for i in "123" %}
-            {% if forloop.counter <= review.rating %}
-              ⭐
+{% for review in c.reviews.all %}
+  <div class="p-4 bg-gray-50 rounded-xl border border-gray-200">
+    <div class="flex items-center justify-between mb-1">
+      <div>
+        <p class="font-semibold">{{ review.user.username }}</p>
+        <div class="text-yellow-500 text-sm">
+          {% for i in "123"|make_list %}
+            {% if i|add:0 <= review.rating %}
+              ★
             {% else %}
               ☆
             {% endif %}
@@ -26,29 +14,20 @@
         </div>
       </div>
 
-      <!-- Review Comment -->
-      <p class="text-gray-700 text-sm mt-1">{{ review.comment }}</p>
-
-      <!-- Edit/Delete Buttons (only for the logged-in user's review) -->
-      {% if review.user == user %}
-      <div class="text-right mt-2">
-        <button 
-          class="text-sm text-blue-600 edit-review-btn" 
-          data-review-id="{{ review.id }}">
-          Edit
-        </button>
-        |
-        <button 
-          class="text-sm text-red-600 delete-review-btn" 
-          data-review-id="{{ review.id }}">
-          Delete
-        </button>
-      </div>
+      <!-- Only show for the owner -->
+      {% if user == review.user %}
+        <div class="flex items-center gap-2">
+          <button
+            class="text-sm text-red-600 hover:underline deleteReviewBtn"
+            data-id="{{ review.id }}">
+            Delete
+          </button>
+        </div>
       {% endif %}
     </div>
+
+    <p class="text-gray-700 text-sm">{{ review.comment }}</p>
   </div>
-  {% endfor %}
-</div>
-{% else %}
-<p class="text-gray-500 text-center mt-4">No reviews yet. Be the first to share your experience!</p>
-{% endif %}
+{% empty %}
+  <p class="text-gray-500 italic">No reviews yet.</p>
+{% endfor %}

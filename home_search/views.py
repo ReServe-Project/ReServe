@@ -66,10 +66,17 @@ class OwnerRequiredMixin(UserPassesTestMixin):
         return self.request.user.is_authenticated and obj.owner_id == self.request.user.id
 
 
+from product_details.models import Review  # import your model
+
 class ClassDetailView(DetailView):
     model = Class
     template_name = "home_search/class_detail.html"
     context_object_name = "c"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["reviews"] = Review.objects.filter(class_item=self.object)
+        return context
 
 
 class ClassCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):

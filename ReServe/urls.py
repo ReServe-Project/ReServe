@@ -10,6 +10,8 @@ urlpatterns = [
     # your existing apps
     path('', include('accounts.urls')),
     path('', include('main.urls')),
+    path('', include('product_details.urls')),
+
 ]
 
 if settings.DEBUG:
