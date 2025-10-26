@@ -10,10 +10,10 @@
 
 /* Header: "Checkout" title and back button */
 .checkout-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
+    display: flex;         /* Make items go side-by-side */
+    align-items: center;   /* Vertically align them in the middle */
+    gap: 16px;             /* Add space between button and title */
+    margin-bottom: 24px;   /* Keep space below the header */
 }
 
 .back-button {
