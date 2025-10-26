@@ -11,10 +11,14 @@
 {% block content %} {# FIXED: All content must be inside a block #}
 
 <div class="checkout-container">
-    <a href="javascript:history.back()" class="back-button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-    </a>
-    <h1 class="checkout-title">Checkout</h1>
+
+    {# ADDED: This div groups the button and title #}
+    <div class="checkout-header">
+        <a href="javascript:history.back()" class="back-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </a>
+        <h1 class="checkout-title">Checkout</h1>
+    </div> {# END ADDED div #}
 
     <div class="checkout-content">
         <div class="booking-details-card">
