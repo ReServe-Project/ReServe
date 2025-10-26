@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from main.views import register, login_user, logout_user, show_main
 
 app_name = 'main'

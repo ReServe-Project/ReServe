@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    {% block meta %} {% endblock meta %}
+    {% block meta %} ReServe {% endblock meta %}
 <script src="https://cdn.tailwindcss.com">
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&family=Poppins:wght@700;800&family=Ubuntu:wght@400&display=swap" rel="stylesheet">
@@ -18,7 +18,9 @@
 
 <body class="font-body text-slate-800 bg-[#FEFDF5]">
   {% include 'navbar.html' %}
-  <main class="relative">{% block content %}{% endblock %}</main>
+  <main class="relative">
+    {% block content %}{% endblock %}
+  </main>
   {% block scripts %}{% endblock scripts %}
 </body>
 </html>

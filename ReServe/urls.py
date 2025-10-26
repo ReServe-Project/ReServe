@@ -10,8 +10,7 @@ urlpatterns = [
     # your existing apps
     path('', include('accounts.urls')),
     path('', include('main.urls')),
-    path('blog/', include('blog.urls')),
-    path('accounts/', include("django.contrib.auth.urls")),
+    path('blog/', include('blog.urls'))
 ]
 
 if settings.DEBUG:

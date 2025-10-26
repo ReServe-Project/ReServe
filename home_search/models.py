@@ -19,7 +19,17 @@ class Class(models.Model):
     datetime   = models.DateTimeField(null=True, blank=True)
     location    = models.CharField(max_length=200, blank=True)
 
+
+    datetime   = models.DateTimeField(null=True, blank=True)
+    location    = models.CharField(max_length=200, blank=True)
+
     def __str__(self): return self.name
+
+    @property
+    def hero_image(self) -> str:
+        return self.image_url or ""
+
+
 
     @property
     def hero_image(self) -> str:
