@@ -36,7 +36,9 @@
 
 .checkout-title {
     font-size: 2.25rem; /* 36px */
-    font-weight: 600;
+    font-weight: bold;  /* Or use 700 */
+    color: #4C4974;     /* Dark purple from your design */
+    /* Keep any other existing properties like margin */
 }
 
 /* Flex container for the two columns */
