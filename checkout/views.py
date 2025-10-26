@@ -1,16 +1,17 @@
 # checkout/views.py
 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required # <--- Make sure this is imported
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from product_details.models import ClassDetails
+from home_search.models import Class  # <-- FIX 1: Import from the correct app
 from .models import Booking
 from .forms import BookingForm
 from django.views.decorators.http import require_POST
 
 @login_required
 def checkout_view(request, class_id):
-    class_to_book = get_object_or_404(ClassDetails, pk=class_id)
+    # FIX 2: Use the correct model name 'Class'
+    class_to_book = get_object_or_404(Class, pk=class_id)
     
     if request.method == 'POST':
         form = BookingForm(request.POST)
@@ -25,7 +26,8 @@ def checkout_view(request, class_id):
             
             booking.save()
             
-            messages.success(request, f'Successfully booked {class_to_book.class_name}!')
+            # Use the correct attribute for the class name (it's .name)
+            messages.success(request, f'Successfully booked {class_to_book.name}!')
             
             return redirect('checkout:booking_history')
     else:
@@ -35,11 +37,10 @@ def checkout_view(request, class_id):
         'class': class_to_book,
         'form': form,
     }
-    # FIX 1: Use the correct template path
     return render(request, 'checkout/checkout.html', context)
 
 
-@login_required  # <-- FIX 2: ADD THIS DECORATOR
+@login_required
 def booking_history_view(request):
     # Get the status from the URL's query parameters (e.g., ?status=PAID)
     status_filter = request.GET.get('status')
@@ -58,7 +59,6 @@ def booking_history_view(request):
         'bookings': user_bookings,
         'current_filter': status_filter # Pass the current filter to the template
     }
-    # FIX 1 (Applied): Use the correct template path
     return render(request, 'checkout/booking_history.html', context)
 
 @require_POST # Ensures this view can only be accessed with a POST request
