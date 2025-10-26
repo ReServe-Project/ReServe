@@ -30,19 +30,21 @@
             {% for booking in bookings %}
                 <div class="booking-card">
                     <div class="card-image">
-                        {# NOTE: Assuming your friend's ClassDetails model has an 'image' field #}
-                        {% if booking.class_booked.image %}
-                            <img src="{{ booking.class_booked.image.url }}" alt="{{ booking.class_booked.class_name }}">
+                        {# --- FIX 1: Check the correct image field --- #}
+                        {% if booking.class_booked.image_url %}
+                            {# --- FIX 2: Use the correct image field and name field --- #}
+                            <img src="{{ booking.class_booked.image_url }}" alt="{{ booking.class_booked.name }}">
                         {% else %}
                             <div class="image-placeholder"></div>
                         {% endif %}
                     </div>
                     <div class="card-title">
-                        <h3>{{ booking.class_booked.class_name }}</h3>
+                        {# --- FIX 3: Use the correct name field --- #}
+                        <h3>{{ booking.class_booked.name }}</h3>
                     </div>
                     <div class="card-details">
                         {# NOTE: Using the class date/time, not the booking date #}
-                        <p>{{ booking.class_booked.date_time|date:"d F Y H.i" }}</p>
+                        <p>{{ booking.class_booked.datetime|date:"d F Y H.i" }}</p> {# Assuming the field is named datetime #}
                         <p>{{ booking.class_booked.location }}</p>
                     </div>
                     <div class="card-actions">
@@ -61,9 +63,8 @@
 
         <div class="sidebar-column">
             <div class="explore-card">
-                <img src="{% static 'images/track.png' %}" alt="Running Track"> 
+                <img src="{% static 'images/track.png' %}" alt="Running Track">
                 <h3>Check out more classes!</h3>
-                {# NOTE: Assuming your search page URL is named 'search' in the 'main' app #}
                 <a href="{% url 'home_search:search' %}" class="btn-explore">Explore more</a>
             </div>
         </div>
