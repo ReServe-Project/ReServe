@@ -1,0 +1,47 @@
+{% load static %}
+<header class="sticky top-0 z-50 bg-[#FBF8EC] border-b border-black/5 shadow-md">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex items-center">
+    <!-- left: tiny logo -->
+    <a href="/" class="shrink-0 mr-6" aria-label="ReServe">
+      <img src="{% static 'img/mini-logo.png' %}" alt="ReServe mini logo" class="h-10 w-auto"/>
+    </a>
+
+    <!-- center: nav links -->
+    <nav class="flex-1 flex items-center justify-center gap-28 text-[17px] font-semibold">
+      <a href="/"
+         class="{% if request.path == '/' or request.path|slice:':7' == '/search' %}text-[#A6542F]{% else %}text-[#3D3C5B]{% endif %} hover:opacity-80">
+        Home
+      </a>
+      <a href="/blog/"
+         class="{% if request.path|slice:':6' == '/blog/' %}text-[#A6542F]{% else %}text-[#3D3C5B]{% endif %} hover:opacity-80">
+        Blog
+      </a>
+      <a href="/goals/"
+         class="{% if request.path|slice:':7' == '/goals/' %}text-[#A6542F]{% else %}text-[#3D3C5B]{% endif %} hover:opacity-80">
+        Personal Goals
+      </a>
+      <a href="/history/"
+         class="{% if request.path|slice:':9' == '/history/' %}text-[#A6542F]{% else %}text-[#3D3C5B]{% endif %} hover:opacity-80">
+        History
+      </a>
+    </nav>
+
+    <!-- right: login/logout pill -->
+    <div class="ml-6">
+      {% if request.user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}" class="inline">
+          {% csrf_token %}
+          <button type="submit"
+                  class="inline-block px-6 py-2.5 rounded-2xl bg-[#4C4974] text-white font-semibold shadow-sm hover:brightness-110">
+            Logout
+          </button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}"
+           class="inline-block px-6 py-2.5 rounded-2xl bg-[#4C4974] text-white font-semibold shadow-sm hover:brightness-110">
+          Login
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</header>

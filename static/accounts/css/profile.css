@@ -1,0 +1,172 @@
+:root{
+    --bg:#f6f2e9; --ink:#20160b; --muted:#7a6f58;
+    --purple:#565484; --orange:#f07a3b;
+    --chip:#2f2d58; --card:#ffffff;
+    --ring:rgba(86,84,132,.25);
+    --radius:24px; --shadow:0 30px 70px rgba(0,0,0,.20);
+  }
+  
+  html,body{margin:0;padding:0;background:var(--bg);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  
+  /* Base background: normal */
+  .profile-bg {
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+    position: relative;
+  }
+  
+  /* Default: no overlay/blur (keeps page normal) */
+  .profile-bg::before {
+    content: none;
+  }
+  
+  /* When the modal is open we add .blurred to .profile-bg via JS */
+  .profile-bg.blurred::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* subtle dim so the card/modal stands out */
+    background: rgba(20, 20, 20, 0.35);
+    /* soft blur to the gym background */
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 0;
+  }
+  
+  .profile-container {
+    position: relative;
+    z-index: 1; /* keeps the card & modal above the overlay */
+  }
+  
+  .profile-card{
+    background:var(--card); border-radius:28px; box-shadow:var(--shadow);
+    padding:28px; overflow:hidden;
+  }
+  
+  .card-head{display:flex; gap:24px; align-items:center}
+  .avatar-wrap{position:relative; width:140px; height:140px; border-radius:20px; overflow:hidden; background:#eee; flex:0 0 140px}
+  .avatar-wrap img{width:100%; height:100%; object-fit:cover}
+  .avatar-btn{
+    position:absolute; right:10px; bottom:10px; font-size:12px;
+    background:var(--purple); color:#fff; padding:6px 10px; border-radius:10px; cursor:pointer;
+  }
+  
+  .identity{display:flex; flex-direction:column; gap:6px}
+  .reserve-badge{
+    display:inline-block; padding:6px 12px; border:3px solid var(--orange);
+    border-radius:14px; color:var(--orange); font-weight:800; letter-spacing:.4px; width:max-content;
+  }
+  .display-name{margin:6px 0 0; font-size:40px; font-weight:900; color:#282018}
+  .meta-row{display:flex; gap:10px; align-items:center}
+  .chip{background:var(--chip); color:#fff; padding:4px 10px; border-radius:999px; font-weight:700; font-size:12px}
+  .handle{color:#6b5f4b; font-weight:600}
+  
+  .metrics{
+    display:grid; grid-template-columns: repeat(3, 1fr);
+    gap:16px; margin:22px 0;
+  }
+  .metric{
+    background:#faf8f2; border-radius:16px; padding:16px 18px; border:1px solid #ece7de;
+  }
+  .metric .label{color:#7e7360; font-weight:800; font-size:12px; letter-spacing:.08em}
+  .metric .value{font-weight:900; font-size:28px; margin-top:6px; color:#332516}
+  .metric .unit{color:#857a69; font-weight:700; margin-left:6px}
+  
+  .card-foot{display:flex; justify-content:space-between; align-items:center; margin-top:10px}
+  .last-login{color:#fff; background:var(--orange); padding:12px 16px; border-radius:12px; font-weight:700}
+  .btn-primary{
+    background:#565484; color:#fff; font-weight:800; border:0; border-radius:12px; padding:14px 18px; cursor:pointer;
+  }
+  .btn-primary:hover{filter:brightness(.95)}
+  .btn-ghost{
+    background:#fff0; border:2px solid #e8e0d3; color:#5b4b33; border-radius:12px; padding:12px 16px; font-weight:800; cursor:pointer;
+  }
+  .btn-ghost:hover{background:#f5eee3}
+  
+  @media (max-width:900px){
+    .card-head{flex-direction:column; align-items:flex-start}
+    .metrics{grid-template-columns:1fr}
+    .display-name{font-size:34px}
+  }
+  
+  /* Modal */
+  .modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.45); z-index:50; backdrop-filter:blur(2px)}
+  .modal.show{display:flex}
+  .modal-card{
+    background:#fbf7ef; border-radius:28px; width:min(720px, 92vw);
+    box-shadow:var(--shadow); padding:26px;
+  }
+  .modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px}
+  .modal-head h2{margin:0; font-size:32px; font-weight:900; color:#24170b}
+  .x-close{background:#0000; border:0; font-size:22px; cursor:pointer}
+  
+  .edit-grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:6px;
+  }
+  .field{display:flex; flex-direction:column; gap:6px}
+  .field label{font-weight:800; color:#423520}
+  .field input{
+    border:1px solid #ded7cb; background:#fff; padding:12px 14px; border-radius:12px; outline:none;
+  }
+  .field input:focus{box-shadow:0 0 0 4px var(--ring); border-color:#565484}
+  .span-2{grid-column:1 / -1}
+  .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:4px}
+  .form-errors{color:#b42318; font-weight:700; min-height:1em}
+  /* --- Modal a11y focus states --- */
+  .modal .x-close,
+  .modal .btn-ghost,
+  .modal .btn-primary,
+  .modal input,
+  .modal select,
+  .modal button {
+    outline: none;
+  }
+  .modal .x-close:focus,
+  .modal .btn-ghost:focus,
+  .modal .btn-primary:focus,
+  .modal input:focus,
+  .modal select:focus,
+  .modal button:focus {
+    box-shadow: 0 0 0 3px rgba(86,84,132,.35);
+    border-radius: 10px;
+  }
+
+  /* a11y: highlight invalid fields */
+  .modal input[aria-invalid="true"],
+  .modal select[aria-invalid="true"] {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(220,38,38,.2) !important;
+  }  
+
+  /* --- Toast (simple) --- */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%) translateY(16px);
+    background: #2b2b2b;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .25s ease, opacity .25s ease;
+    z-index: 60;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+
+  
+  

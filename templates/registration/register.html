@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block meta %}
+<title>Register • ReServe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-grid">
+
+  <!-- Left visual -->
+  <section class="track-wrap">
+    <div class="logo-pill">
+      <img src="{% static 'accounts/img/logo.png' %}" alt="ReServe">
+    </div>
+    <div class="track-hero" style="background-image:url('{% static 'accounts/img/track-bg.jpg' %}');"></div>
+  </section>
+
+  <!-- Right: Register form -->
+  <section class="form-panel">
+    <div class="form">
+      <h1>Register</h1>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <!-- Username -->
+        <div class="field">
+          <label for="{{ form.username.id_for_label }}">Username</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+            <div class="error-inline">{{ form.username.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Role (+ help link) -->
+        <div class="field">
+          <label for="{{ form.role.id_for_label }}">
+            Role
+            <a href="#" id="role-help" style="margin-left:.5rem; font-weight:600;">What is role?</a>
+          </label>
+          {{ form.role }}
+          {% if form.role.errors %}
+            <div class="error-inline">{{ form.role.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Passwords -->
+        <div class="field">
+          <label for="{{ form.password1.id_for_label }}">Password</label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}
+            <div class="error-inline">{{ form.password1.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        <div class="field">
+          <label for="{{ form.password2.id_for_label }}">Password confirmation</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}
+            <div class="error-inline">{{ form.password2.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        <button class="primary-btn" type="submit">Register</button>
+
+        <p class="small-note">
+          Already have an account? <a href="{% url 'login' %}">Log in</a>
+        </p>
+      </form>
+    </div>
+  </section>
+
+</div>
+
+<!-- Role modal -->
+<div class="modal" id="role-modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="role-title">
+    <h3 id="role-title">What is role?</h3>
+    <p><strong>Instructor:</strong></p>
+    <ul>
+      <li>Access to create blogs</li>
+      <li>Access to create classes</li>
+    </ul>
+    <p style="margin-top:10px;"><strong>Member:</strong></p>
+    <ul>
+      <li>Access to create blogs</li>
+    </ul>
+    <div class="modal-actions">
+      <button type="button" id="role-ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const help = document.getElementById('role-help');
+    const modal = document.getElementById('role-modal');
+    const okBtn = document.getElementById('role-ok');
+    if (help && modal && okBtn) {
+      help.addEventListener('click', function (e) {
+        e.preventDefault();
+        modal.style.display = 'flex';
+      });
+      okBtn.addEventListener('click', function () {
+        modal.style.display = 'none';
+      });
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) modal.style.display = 'none';
+      });
+    }
+  })();
+</script>
+{% endblock %}
