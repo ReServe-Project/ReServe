@@ -154,14 +154,16 @@ input[type="text"][readonly] {
     padding: 12px;
     font-weight: 600;
     font-size: 1rem;
-    border: 1px solid #D1D5DB;
-    background-color: #F4F4F5; /* Light gray from image */
-    color: #333;
+    /* CHANGE: Background color to orange */
+    background-color: #F97316;
+    color: white; /* Make sure text is white */
+    border: none; /* Remove border if you used gray */
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
+/* CHANGE/ADD: Hover state for the button */
 .confirm-button:hover {
-    background-color: #E5E7EB; /* Slightly darker gray on hover */
+    background-color: #EA580C; /* Slightly darker orange */
 }
