@@ -1,29 +1,27 @@
 {% extends "base.html" %}
-
 {% block title %}{{ blog.title }}{% endblock title %}
-
 {% block content %}
-<div class="min-h-screen bg-[#FEFDF5]">
 
+<div class="min-h-screen bg-[#FEFDF5]">
   <!-- Purple header (taller) -->
   <section class="relative bg-[#434162] h-64 md:h-72">
-    <!-- Back button -->
-    <a href="{% url 'blog:main_blog' %}"
-    class="absolute left-12 top-12 grid place-items-center
-            h-14 w-14 rounded-full bg-white text-[#434162]
-            shadow ring-1 ring-black/10 hover:bg-slate-50"
-    aria-label="Back">
-    <svg viewBox="0 0 24 24" fill="none"
-       stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
-       class="h-7 w-7 block">
-    <path d="M15 19l-7-7 7-7" />
-    </svg>
-    </a>
   </section>
-
   <!-- Overlapping cream card (higher + wider like mockup) -->
   <div class="relative -mt-36 md:-mt-40 lg:-mt-44 mx-4 md:mx-8">
-    <div class="mx-auto max-w-6xl rounded-[28px] bg-[#FEFDF5] p-5 md:p-8 lg:p-9">
+    <div class="mx-auto max-w-6xl rounded-[28px] bg-[#FEFDF5] p-5 md:p-8 lg:p-9 relative">
+
+      <!-- Back button (placed on the cream card top-left) -->
+      <a href="{% url 'blog:main_blog' %}"
+         class="absolute -left-20 top-0 grid place-items-center
+                h-10 w-10 rounded-full bg-white text-[#434162]
+                shadow ring-1 ring-black/10 hover:bg-slate-50 z-20"
+         aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+             class="h-7 w-7 block">
+          <path d="M15 19l-7-7 7-7" />
+        </svg>
+      </a>
 
       <!-- Top row: small image left + title/meta right -->
       <div class="grid grid-cols-1 md:grid-cols-5 gap-6 md:gap-10 items-start">
@@ -31,20 +29,42 @@
         <div class="md:col-span-2">
           {% if blog.thumbnail %}
             <img src="{{ blog.thumbnail }}" alt="Blog thumbnail"
-                 class="w-full h-40 md:h-44 lg:h-48 object-cover rounded-[16px] ring-1 ring-black/5 shadow-sm">
+                 class="w-full h-48 md:h-56 lg:h-64 object-cover rounded-[16px] ring-1 ring-black/5 shadow-sm">
           {% else %}
-            <div class="w-full h-40 md:h-44 lg:h-48 rounded-[16px] bg-slate-200 ring-1 ring-black/5"></div>
+            <div class="w-full h-48 md:h-56 lg:h-64 rounded-[16px] bg-slate-200 ring-1 ring-black/5"></div>
           {% endif %}
         </div>
 
+
         <!-- Title + meta -->
-        <div class="md:col-span-3">
-          <h1 class="font-head text-3xl md:text-4xl lg:text-[40px] font-extrabold leading-tight text-[#793217]">
+        <div class="w-full h-full flex flex-col md:col-span-3 gap-2">
+          <h1
+            class="font-head text-2xl font-extrabold leading-tight text-[#793217]
+                  break-words hyphens-auto [overflow-wrap:anywhere]">
             {{ blog.title }}
           </h1>
-          <div class="mt-2 text-[11px] md:text-xs text-slate-600">
+          <div class="mt-2 text-md text-slate-600">
+            {% if blog.user %}
+              <p>By {{ blog.user.username }}</p>
+            {% endif %}
             {% if blog.created_at %}
               <p>{{ blog.created_at|date:"F jS, Y" }}</p>
+            {% endif %}
+          </div>
+          <div class="mt-auto flex gap-3 z-20">
+          {% if request.user.is_authenticated and request.user.id == blog.user.id %}
+            <button type="button"
+                    class="openEditBtn bg-blue-600 px-4 py-2 rounded-xl text-white"
+                    data-blog-id="{{ blog.pk }}"
+                    data-blog-title="{{ blog.title }}"
+                    data-blog-thumbnail="{{ blog.thumbnail|default_if_none:'' }}"
+                    data-blog-content="{{ blog.content|escapejs }}">
+              Edit
+            </button>
+            <button type="button" class="openDeleteBtn bg-red-600 px-4 py-2 rounded-xl text-white"
+                    data-blog-id="{{ blog.pk }}" data-blog-title="{{ blog.title }}">
+              Delete
+            </button>
             {% endif %}
           </div>
         </div>
@@ -54,8 +74,214 @@
       <article class="mt-6 md:mt-8 lg:mt-10 max-w-5xl text-slate-800 leading-7 md:leading-8">
         {{ blog.content|linebreaks }}
       </article>
+
+    </div>
+
+  </div>
+
+
+  <!-- EDIT BLOG MODAL -->
+  <div id="editModal" class="fixed inset-0 z-[101] hidden" aria-hidden="true">
+    <div id="editModalBackdrop" class="absolute inset-0 bg-black/50"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="w-full max-w-lg rounded-[28px] bg-[#FEFDF5] shadow-xl ring-1 ring-black/10 p-6 md:p-8">
+        <div class="text-center mb-4">
+          <h2 class="font-head text-3xl font-extrabold text-slate-800">Edit Blog</h2>
+        </div>
+        <form id="editBlogForm" method="POST" action="" class="space-y-5">
+          {% csrf_token %}
+          <input type="hidden" name="blog_id" id="editBlogId">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700">Title</label>
+            <input type="text" name="title" id="editBlogTitle" required
+                  class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700">Thumbnail</label>
+            <input type="url" name="thumbnail" id="editBlogThumbnail" placeholder="Link"
+                  class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700">Content</label>
+            <textarea name="content" id="editBlogContent" rows="6" placeholder="Enter content"
+                      class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800"></textarea>
+          </div>
+          <div>
+            <p id="editFormErrors" class="hidden text-sm text-red-600"></p>
+          </div>
+          <div class="mt-6 flex items-center justify-between gap-4">
+            <button type="button" id="cancelEditBtn"
+                    class="w-40 rounded-xl border border-orange-300 bg-orange-50 px-5 py-3 font-semibold text-orange-700 hover:bg-orange-100">
+              Cancel
+            </button>
+            <button type="submit"
+                    class="w-44 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white hover:bg-orange-600">
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
+
+  <!-- DELETE BLOG MODAL -->
+  <div id="deleteModal" class="fixed inset-0 z-[102] hidden" aria-hidden="true">
+    <div id="deleteModalBackdrop" class="absolute inset-0 bg-black/50"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="w-full max-w-md rounded-[28px] bg-[#FEFDF5] shadow-xl ring-1 ring-black/10 p-6 md:p-8">
+        <div class="text-center mb-4">
+          <h2 class="font-head text-2xl font-extrabold text-slate-800">Delete Blog</h2>
+          <p id="deleteBlogTitle" class="mt-2 text-slate-700"></p>
+        </div>
+        <form id="deleteBlogForm" method="POST" action="" class="space-y-5">
+          {% csrf_token %}
+          <input type="hidden" name="blog_id" id="deleteBlogId">
+          <div class="mt-6 flex items-center justify-between gap-4">
+            <button type="button" id="cancelDeleteBtn"
+                    class="w-40 rounded-xl border border-orange-300 bg-orange-50 px-5 py-3 font-semibold text-orange-700 hover:bg-orange-100">
+              Cancel
+            </button>
+            <button type="submit"
+                    class="w-44 rounded-xl bg-red-500 px-5 py-3 font-semibold text-white hover:bg-red-600">
+              Delete
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
+
 {% endblock content %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+  const editModal = document.getElementById('editModal');
+  const editBackdrop = document.getElementById('editModalBackdrop');
+  const openEditBtns = Array.from(document.querySelectorAll('.openEditBtn'));
+  const cancelEditBtn = document.getElementById('cancelEditBtn');
+  const editForm = document.getElementById('editBlogForm');
+  const editBlogId = document.getElementById('editBlogId');
+  const editBlogTitle = document.getElementById('editBlogTitle');
+  const editBlogThumbnail = document.getElementById('editBlogThumbnail');
+  const editBlogContent = document.getElementById('editBlogContent');
+  const editErrorBox = document.getElementById('editFormErrors');
+
+  const deleteModal = document.getElementById('deleteModal');
+  const deleteBackdrop = document.getElementById('deleteModalBackdrop');
+  const openDeleteBtns = Array.from(document.querySelectorAll('.openDeleteBtn'));
+  const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+  const deleteForm = document.getElementById('deleteBlogForm');
+  const deleteBlogId = document.getElementById('deleteBlogId');
+  const deleteBlogTitle = document.getElementById('deleteBlogTitle');
+  const deleteErrorBox = document.getElementById('deleteFormErrors');
+
+  const closeEditModal = () => {
+    editModal?.classList.add('hidden');
+    if (editErrorBox) { editErrorBox.classList.add('hidden'); editErrorBox.textContent = ''; }
+  };
+
+  const closeDeleteModal = () => {
+    deleteModal?.classList.add('hidden');
+    if (deleteErrorBox) { deleteErrorBox.classList.add('hidden'); deleteErrorBox.textContent = ''; }
+  };
+
+  if (editModal) {
+    const openEditModal = (btn) => {
+      editBlogId.value = btn.dataset.blogId;
+      editBlogTitle.value = btn.dataset.blogTitle || '';
+      editBlogThumbnail.value = btn.dataset.blogThumbnail || '';
+      editBlogContent.value = btn.dataset.blogContent || '';
+      editForm.setAttribute('action', `/blog/edit/${btn.dataset.blogId}/`);
+      editModal.classList.remove('hidden');
+      if (editErrorBox) { editErrorBox.classList.add('hidden'); editErrorBox.textContent = ''; }
+    };
+
+
+    openEditBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        openEditModal(btn);
+      });
+    });
+
+    editBackdrop?.addEventListener('click', closeEditModal);
+    cancelEditBtn?.addEventListener('click', closeEditModal);
+
+    editForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const url = editForm.getAttribute('action');
+      const formData = new FormData(editForm);
+
+      try {
+        const resp = await fetch(url, { method: 'POST', body: formData });
+        if (resp.ok) {
+          window.location.reload();
+        } else {
+          if (editErrorBox) {
+            editErrorBox.textContent = 'Could not update blog. Please check your inputs.';
+            editErrorBox.classList.remove('hidden');
+          }
+        }
+      } catch {
+        if (editErrorBox) {
+          editErrorBox.textContent = 'Network error. Try again.';
+          editErrorBox.classList.remove('hidden');
+        }
+      }
+    });
+  }
+
+
+  if (deleteModal) {
+    const openDeleteModal = (btn) => {
+      deleteBlogId.value = btn.dataset.blogId;
+      deleteBlogTitle.textContent = `Are you sure you want to delete this blog?`;
+      deleteForm.setAttribute('action', `/blog/delete/${btn.dataset.blogId}/`);
+      deleteModal.classList.remove('hidden');
+      if (deleteErrorBox) { deleteErrorBox.classList.add('hidden'); deleteErrorBox.textContent = ''; }
+    };
+
+
+    openDeleteBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        openDeleteModal(btn);
+      });
+    });
+    deleteBackdrop?.addEventListener('click', closeDeleteModal);
+    cancelDeleteBtn?.addEventListener('click', closeDeleteModal);
+
+    deleteForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const url = deleteForm.getAttribute('action');
+      const formData = new FormData(deleteForm);
+
+
+
+      try {
+        const resp = await fetch(url, { method: 'POST', body: formData });
+        if (resp.ok) {
+          window.location.href = "{% url 'blog:main_blog' %}";
+        } else {
+          if (deleteErrorBox) {
+            deleteErrorBox.textContent = 'Could not delete blog. Please try again.';
+            deleteErrorBox.classList.remove('hidden');
+          }
+        }
+      } catch {
+        if (deleteErrorBox) {
+          deleteErrorBox.textContent = 'Network error. Try again.';
+          deleteErrorBox.classList.remove('hidden');
+        }
+      }
+    });
+  }
+});
+
+</script>
+
+{% endblock scripts %}

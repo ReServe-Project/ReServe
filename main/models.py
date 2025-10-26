@@ -5,11 +5,7 @@ from django.utils import timezone
 import uuid
 
 class PersonalGoal(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="personal_goals",
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     date = models.DateField()
     is_completed = models.BooleanField(default=False)
@@ -20,13 +16,11 @@ class PersonalGoal(models.Model):
         indexes = [
             models.Index(fields=["user", "date"]),
         ]
-
     def __str__(self):
         return f"{self.title} ({self.date})"
 
 class Blogs(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user= models.ForeignKey(User, on_delete=models.CASCADE, related_name='blogs')
     title = models.CharField(max_length=255)
     content = models.TextField()
     thumbnail = models.URLField(blank=True, null=True)
