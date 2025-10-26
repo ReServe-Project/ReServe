@@ -20,7 +20,7 @@
          class="{% if request.path|slice:':7' == '/goals/' %}text-[#A6542F]{% else %}text-[#3D3C5B]{% endif %} hover:opacity-80">
         Personal Goals
       </a>
-      <a href="/history/"
+      <a href="{% url 'checkout:booking_history' %}"
          class="{% if request.path|slice:':9' == '/history/' %}text-[#A6542F]{% else %}text-[#3D3C5B]{% endif %} hover:opacity-80">
         History
       </a>

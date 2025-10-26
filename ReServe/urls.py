@@ -8,10 +8,13 @@ urlpatterns = [
     # master added this app routing — keep it
     path('', include(('home_search.urls', 'home_search'))),
     # your existing apps
-    path('', include('accounts.urls')),
+    path('accounts/', include('accounts.urls')),
     path('', include('main.urls')),
     path('blog/', include('blog.urls')),
-    path('goals/', include('PersonalGoals.urls'))
+    path('goals/', include('PersonalGoals.urls')),
+    path('history/', include('checkout.urls')),
+    path('', include('product_details.urls')),
+    path('checkout/', include('checkout.urls')),
 ]
 
 if settings.DEBUG:
