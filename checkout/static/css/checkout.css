@@ -1,92 +1,84 @@
 /* checkout/static/css/checkout.css */
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f7f7f7; /* Light background as in design */
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Align to top */
-    min-height: 100vh;
+/* Main container for the whole checkout box */
+.checkout-container {
+    max-width: 900px; /* Max width of the entire component */
+    margin: 40px auto; /* Center it on the page with space from the navbar */
+    padding: 24px;
+    position: relative;
 }
 
-.checkout-container {
-    background-color: #fff; /* White background for the main content area */
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 90%; /* Adjust as needed */
-    max-width: 1000px; /* Max width to keep it centered */
-    margin-top: 50px; /* Space from the top */
-    position: relative; /* For back button positioning */
+/* Header: "Checkout" title and back button */
+.checkout-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
 }
 
 .back-button {
-    position: absolute;
-    top: 30px;
-    left: 30px;
-    color: #333;
-    text-decoration: none;
-    font-size: 24px;
     display: flex;
     align-items: center;
-    cursor: pointer;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%; /* Makes it a circle */
+    border: 1px solid #E0E0E0;
+    background-color: #fff;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s;
 }
 
-.back-button svg {
-    margin-right: 5px;
+.back-button:hover {
+    background-color: #f5f5f5;
 }
 
 .checkout-title {
-    font-size: 2em;
-    color: #333;
-    margin-left: 50px; /* Offset for back button */
-    margin-bottom: 30px;
+    font-size: 2.25rem; /* 36px */
+    font-weight: 600;
 }
 
+/* Flex container for the two columns */
 .checkout-content {
     display: flex;
-    gap: 30px;
-    margin-top: 30px;
+    flex-direction: row;
+    gap: 24px;
 }
 
+/* Left column: Booking Details */
 .booking-details-card {
-    flex: 2; /* Takes more space */
-    background-color: #f9f9f9;
-    padding: 25px;
-    border-radius: 8px;
-    border: 1px solid #eee;
+    flex: 2; /* Takes up 2/3 of the space */
+    background-color: #ffffff;
+    border: 1px solid #E0E0E0;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
+/* Right column: Payment Card */
 .payment-card {
-    flex: 1; /* Takes less space */
-    background-color: #f0f0f0; /* Slightly darker background for payment */
-    padding: 25px;
-    border-radius: 8px;
-    border: 1px solid #eee;
+    flex: 1; /* Takes up 1/3 of the space */
+    background-color: #ffffff;
+    border: 1px solid #E0E0E0;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    /* We add text-align: center to center the QR code and button */
     text-align: center;
+    overflow: hidden; /* Keeps the header inside the rounded corners */
 }
 
 .payment-card h2 {
-    color: #4A4A4A; /* Dark blue/purple from your design */
-    font-size: 1.5em;
-    margin-bottom: 20px;
+    /* This is the "QRIS Payment Only" header */
+    background-color: #4C4974; /* Dark purple from your design */
+    color: white;
+    font-size: 1.125rem; /* 18px */
+    font-weight: 600;
+    padding: 16px;
+    margin: 0; /* Remove default margin */
 }
 
-.qris-image-placeholder {
-    width: 150px; /* Placeholder size for QRIS image */
-    height: 150px;
-    background-color: #ddd;
-    margin: 20px auto;
-    border-radius: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #888;
-    font-size: 0.9em;
-}
-
+/* Form Styling */
 .form-group {
     margin-bottom: 20px;
 }
@@ -94,78 +86,80 @@ body {
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    font-weight: bold;
+    font-weight: 500;
     color: #555;
+    font-size: 0.875rem; /* 14px */
 }
 
-.form-control,
-input[type="text"],
-input[type="email"],
-input[type="tel"] {
+/* This styles your Django form fields */
+.form-group input,
+.form-control {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1em;
-    box-sizing: border-box; /* Include padding in width */
+    padding: 10px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box; /* IMPORTANT */
 }
 
 input[type="text"][readonly] {
-    background-color: #e9e9e9;
+    background-color: #f4f4f5; /* Lighter gray for readonly */
     cursor: not-allowed;
+    color: #777;
 }
 
+/* Container for Phone and Email */
 .form-row {
     display: flex;
     gap: 20px;
-    margin-bottom: 20px;
 }
 
 .form-row .half-width {
-    flex: 1;
+    flex: 1; /* Each takes half the space */
 }
 
+/* Payment Card Content */
 .checkbox-group {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 20px;
+    gap: 8px;
+    padding: 20px 0;
+}
+
+.checkbox-group label {
+    font-size: 0.875rem;
+    color: #333;
+}
+
+#qris_details {
+    padding: 0 24px 24px 24px; /* Padding for the QR/button */
+}
+
+.qris-image-placeholder {
     margin-bottom: 20px;
 }
 
-.checkbox-group input[type="checkbox"] {
-    margin-right: 10px;
-    width: 18px;
-    height: 18px;
+.qris-image-placeholder img {
+    width: 150px;
+    height: 150px;
+    border: 1px solid #eee;
+    border-radius: 8px;
 }
 
 .confirm-button {
-    background-color: #6A1B9A; /* Deep purple from your design */
-    color: white;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.1em;
-    cursor: pointer;
     width: 100%;
-    transition: background-color 0.3s ease;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: 1px solid #D1D5DB;
+    background-color: #F4F4F5; /* Light gray from image */
+    color: #333;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
 .confirm-button:hover {
-    background-color: #5B148A;
-}
-
-.error {
-    color: red;
-    font-size: 0.9em;
-    margin-top: 5px;
-}
-
-/* Base styles for Django forms */
-/* Adjust .as_p output if you use it for error messages */
-.errorlist {
-    color: red;
-    margin-top: 5px;
-    list-style-type: none;
-    padding: 0;
+    background-color: #E5E7EB; /* Slightly darker gray on hover */
 }
