@@ -1,7 +1,7 @@
 # checkout/views.py
 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required # <--- Make sure this is imported
 from django.contrib import messages
 from product_details.models import ClassDetails
 from .models import Booking
@@ -35,10 +35,11 @@ def checkout_view(request, class_id):
         'class': class_to_book,
         'form': form,
     }
-    return render(request, 'checkout.html', context)
+    # FIX 1: Use the correct template path
+    return render(request, 'checkout/checkout.html', context)
 
 
-@login_required
+@login_required  # <-- FIX 2: ADD THIS DECORATOR
 def booking_history_view(request):
     # Get the status from the URL's query parameters (e.g., ?status=PAID)
     status_filter = request.GET.get('status')
@@ -57,7 +58,8 @@ def booking_history_view(request):
         'bookings': user_bookings,
         'current_filter': status_filter # Pass the current filter to the template
     }
-    return render(request, 'booking_history.html', context)
+    # FIX 1 (Applied): Use the correct template path
+    return render(request, 'checkout/booking_history.html', context)
 
 @require_POST # Ensures this view can only be accessed with a POST request
 @login_required
