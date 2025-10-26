@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'main',
     'home_search',
     'accounts',
+    'product_details',
     'blog',
     'checkout',
 ]
