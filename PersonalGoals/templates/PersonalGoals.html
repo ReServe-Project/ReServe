@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Personal Goals - ReServe{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="min-h-screen bg-[#FBF8F1]">
+  <div class="mx-auto max-w-[1200px] px-6 py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+
+      <!-- LEFT: Calendar + prompt -->
+      <div class="w-full">
+        <!-- orange prompt pill -->
+        <div class="inline-block rounded-xl bg-[#E86C2A] text-white font-semibold px-6 py-3 shadow-sm mb-6" style="width: 436px;">
+          Select a date to set your goals!
+        </div>
+
+        <!-- Calendar card -->
+        <div class="rounded-xl border border-[#E86C2A] bg-[#FFF9F0] p-6" style="width: 436px; height: 439px;">
+          <!-- header -->
+          <div class="flex items-center justify-between">
+            <button id="prevMonth"
+                    class="w-8 h-8 grid place-items-center rounded-md bg-gray-100 hover:bg-gray-200">
+              <svg class="w-4 h-4 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+
+            <div class="text-center">
+              <h2 id="monthYear" class="text-xl font-bold text-[#2E2B41]">{{ month_name }} {{ year }}</h2>
+            </div>
+
+            <button id="nextMonth"
+                    class="w-8 h-8 grid place-items-center rounded-md bg-gray-100 hover:bg-gray-200">
+              <svg class="w-4 h-4 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- days of week -->
+          <div class="grid grid-cols-7 gap-1 mt-6">
+            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">Su</div>
+            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">Mo</div>
+            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">Tu</div>
+            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">We</div>
+            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">Th</div>
+            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">Fr</div>
+            <div class="text-center text-sm font-semibold text-[#6B6B83] py-2">Sa</div>
+          </div>
+
+          <!-- calendar grid -->
+          <div id="calendarGrid" class="grid grid-cols-7 gap-1">
+            {% for week in calendar %}
+              {% for day in week %}
+                {% if day == 0 %}
+                  <div class="h-10"></div>
+                {% else %}
+                  <button
+                    class="calendar-day h-10 text-sm rounded-md transition
+                    {% if day == today_day and month == current_month and year == current_year %} bg-[#E86C2A] text-white {% else %} text-[#2E2B41] hover:bg-gray-100 {% endif %}"
+                    data-date="{{ year }}-{{ month|stringformat:'02d' }}-{{ day|stringformat:'02d' }}"
+                    data-day="{{ day }}">
+                    {{ day }}
+                  </button>
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Goals panel -->
+      <div class="relative w-full">
+          <!-- avatar overlapping the right corner -->
+          <div class="absolute z-20" style="right: 480px; top: -0px;">
+            <div class="w-[109px] h-[109px] rounded-full overflow-hidden ring-4 ring-white bg-gray-300 flex items-center justify-center">
+              <svg class="w-16 h-16 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- title -->
+          <div class="mb-4" style="margin-left: 70px;">
+            <h1 class="text-4xl font-extrabold text-[#111014]">
+              {{ user.first_name }}'s Personal Goals
+            </h1>
+          </div>
+
+        <!-- dark card with orange border -->
+        <div class="relative rounded-2xl bg-[#3F3A59] border-2 border-[#E86C2A] p-6 pt-8 pb-24" style="width: 794px; height: 593px;">
+          <!-- scrollable list, panel fixed height -->
+          <div id="goalsList" class="overflow-y-auto pr-1 space-y-3 flex flex-col items-center mx-auto" style="width: 664px; height: 414px;">
+            {% for date_str, goals in goals_by_date.items %}
+              {% for goal in goals %}
+                <div class="goal-item bg-[#EFEDE8] rounded-xl px-4 py-3 flex items-center" style="width: 664px; height: 61px;">
+                  <input type="checkbox"
+                         class="goal-checkbox w-5 h-5 rounded border-gray-300 text-[#3F3A59] focus:ring-[#3F3A59]"
+                         {% if goal.is_completed %}checked{% endif %}
+                         data-goal-id="{{ goal.id }}">
+                  <span class="goal-title ml-3 text-[#2E2B41] text-[15px] {% if goal.is_completed %}line-through text-gray-500{% endif %}">
+                    {{ goal.title }}
+                  </span>
+                </div>
+              {% endfor %}
+            {% endfor %}
+          </div>
+
+          <!-- bottom notch container -->
+          <div class="absolute left-1/2 -translate-x-1/2 -bottom-6">
+            <!-- the notch "frame" hugging the button -->
+            <div class="rounded-2xl border-2 border-[#E86C2A] bg-[#FBF8F1] px-3 py-3">
+              <button id="addGoalBtn"
+                      class="rounded-xl bg-[#E86C2A] text-white font-semibold hover:bg-[#dd6020] transition flex items-center justify-center"
+                      style="width: 245px; height: 48px;">
+                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12M6 12h12"/>
+                </svg>
+                + Add Goal
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Add Goal Modal -->
+<div id="addGoalModal" class="fixed inset-0 bg-black/50 hidden z-50">
+  <div class="w-full h-full flex items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-xl bg-white p-6">
+      <h2 class="text-xl font-bold text-[#2E2B41] text-center mb-5">Add New Goal</h2>
+      <label for="goalTitle" class="block text-sm font-medium text-[#2E2B41] mb-2">Goal Name</label>
+      <input id="goalTitle" type="text" placeholder="Enter your goal"
+             class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#E86C2A] mb-5">
+      <div class="flex justify-end gap-3">
+        <button id="cancelGoalBtn"
+                class="rounded-lg border border-[#E86C2A] bg-[#FFEDE3] text-[#A44311] px-5 py-2 hover:bg-[#ffdfcf]">
+          Cancel
+        </button>
+        <button id="saveGoalBtn"
+                class="rounded-lg bg-[#E86C2A] text-white px-5 py-2 hover:bg-[#dd6020]">
+          Add goal
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  let currentYear  = {{ year }};
+  let currentMonth = {{ month }};
+  let selectedDate = '{{ today }}';
+
+  // prev / next month
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    if (currentMonth === 1) { currentMonth = 12; currentYear--; } else { currentMonth--; }
+    loadCalendar(currentYear, currentMonth);
+  });
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    if (currentMonth === 12) { currentMonth = 1; currentYear++; } else { currentMonth++; }
+    loadCalendar(currentYear, currentMonth);
+  });
+
+  // day select
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('calendar-day')) {
+      document.querySelectorAll('.calendar-day').forEach(d => {
+        d.classList.remove('bg-[#E86C2A]', 'text-white');
+        d.classList.add('text-[#2E2B41]', 'hover:bg-gray-100');
+      });
+      e.target.classList.add('bg-[#E86C2A]', 'text-white');
+      e.target.classList.remove('text-[#2E2B41]', 'hover:bg-gray-100');
+
+      selectedDate = e.target.dataset.date;
+      loadGoalsForDate(selectedDate);
+    }
+  });
+
+  // modal open/close
+  document.getElementById('addGoalBtn').addEventListener('click', () => {
+    document.getElementById('addGoalModal').classList.remove('hidden');
+    document.getElementById('goalTitle').focus();
+  });
+  document.getElementById('cancelGoalBtn').addEventListener('click', closeModal);
+  document.getElementById('addGoalModal').addEventListener('click', (e) => {
+    if (e.target.id === 'addGoalModal') closeModal();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  function closeModal() {
+    document.getElementById('addGoalModal').classList.add('hidden');
+    document.getElementById('goalTitle').value = '';
+  }
+
+  // save goal
+  document.getElementById('saveGoalBtn').addEventListener('click', () => {
+    const title = document.getElementById('goalTitle').value.trim();
+    if (!title) { alert('Please enter a goal title'); return; }
+
+     fetch('{% url "goals:add_goal" %}', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+       body: JSON.stringify({ title: title, date: selectedDate })
+     })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) { closeModal(); loadGoalsForDate(selectedDate); }
+      else { alert(data.error || 'Failed to add goal'); }
+    })
+    .catch(() => alert('Failed to add goal'));
+  });
+
+  // toggle complete
+  document.addEventListener('change', (e) => {
+    if (!e.target.classList.contains('goal-checkbox')) return;
+    const goalId = e.target.dataset.goalId;
+    const isCompleted = e.target.checked;
+
+    fetch(`{% url "goals:toggle_goal" 0 %}`.replace('0', goalId), {
+      method: 'POST',
+      headers: { 
+        'X-CSRFToken': getCsrfToken(),
+        'Accept': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const title = e.target.nextElementSibling;
+        if (isCompleted) {
+          title.classList.add('line-through', 'text-gray-500');
+        } else {
+          title.classList.remove('line-through', 'text-gray-500');
+        }
+      } else {
+        e.target.checked = !isCompleted;
+      }
+    })
+    .catch(() => { e.target.checked = !isCompleted; });
+  });
+
+  // data loaders
+  function loadCalendar(year, month) {
+    fetch(`{% url "goals:get_calendar_data" 0 0 %}`.replace('0/0', `${year}/${month}`))
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) { currentYear = year; currentMonth = month; updateCalendarDisplay(data.data); }
+      });
+  }
+
+  function updateCalendarDisplay(data) {
+    document.getElementById('monthYear').textContent = `${data.month_name} ${data.year}`;
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '';
+
+    data.calendar.forEach(week => {
+      week.forEach(day => {
+        if (day === 0) {
+          grid.innerHTML += '<div class="h-10"></div>';
+        } else {
+          // FIX: correct date string (use data.month, not data.year twice)
+          const dateStr = `${data.year}-${String(data.month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+          const isSelected = dateStr === selectedDate;
+          const cls = isSelected ? 'bg-[#E86C2A] text-white' : 'text-[#2E2B41] hover:bg-gray-100';
+          grid.innerHTML += `
+            <button class="calendar-day h-10 text-sm rounded-md transition ${cls}"
+                    data-date="${dateStr}" data-day="${day}">
+              ${day}
+            </button>`;
+        }
+      });
+    });
+  }
+
+  function loadGoalsForDate(dateStr) {
+    const [y,m,d] = dateStr.split('-');
+    fetch(`{% url "goals:get_goals_for_date" 0 0 0 %}`.replace('0/0/0', `${y}/${m}/${d}`))
+      .then(r => r.json())
+      .then(data => { if (data.success) updateGoalsList(data.goals); });
+  }
+
+  function updateGoalsList(goals) {
+    const list = document.getElementById('goalsList');
+    list.innerHTML = '';
+    if (!goals.length) return;
+
+    goals.forEach(g => {
+      const row = document.createElement('div');
+      row.className = 'goal-item bg-[#EFEDE8] rounded-xl px-4 py-3 flex items-center';
+      row.style.width = '664px';
+      row.style.height = '61px';
+      
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'goal-checkbox w-5 h-5 rounded border-gray-300 text-[#3F3A59] focus:ring-[#3F3A59]';
+      checkbox.checked = g.is_completed || false;
+      checkbox.setAttribute('data-goal-id', g.id);
+      
+      const span = document.createElement('span');
+      span.className = `goal-title ml-3 text-[#2E2B41] text-[15px] ${g.is_completed ? 'line-through text-gray-500' : ''}`;
+      span.textContent = g.title;
+      
+      row.appendChild(checkbox);
+      row.appendChild(span);
+      list.appendChild(row);
+    });
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      document.cookie.split(';').forEach(c => {
+        const cookie = c.trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        }
+      });
+    }
+    return cookieValue;
+  }
+
+  function getCsrfToken() {
+    // Try to get CSRF token from hidden input
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfInput) return csrfInput.value;
+    // Fallback to cookie
+    return getCookie('csrftoken');
+  }
+});
+</script>
+{% endblock %}

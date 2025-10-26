@@ -4,10 +4,28 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}ReServe{% endblock title %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#4A4A6A',
+                        'secondary': '#A0522D',
+                        'accent': '#E07B4A',
+                        'light-brown': '#E0D9D2',
+                        'background': '#FDFBF8',
+                        'inactive': '#C0B8B0'
+                    }
+                }
+            }
+        }
+    </script>
     {% block meta %} {% endblock meta %}
 </head>
 
-<body>
+<body class="bg-background">
     {% block content %} {% endblock content %}
 </body>
 </html>
