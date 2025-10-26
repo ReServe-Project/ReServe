@@ -72,3 +72,32 @@ def delete_booking(request, booking_id):
     
     messages.success(request, 'Booking has been successfully deleted.')
     return redirect('checkout:booking_history')
+
+
+@login_required
+def edit_booking_view(request, booking_id):
+    # Get the specific booking, ensuring it belongs to the current user
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    
+    # Get the related class details (needed for context, maybe read-only display)
+    class_booked = booking.class_booked 
+
+    if request.method == 'POST':
+        # Populate the form with POST data AND the existing booking instance
+        form = BookingForm(request.POST, instance=booking) 
+        if form.is_valid():
+            form.save() # Save the updated booking details
+            messages.success(request, 'Booking details updated successfully!')
+            return redirect('checkout:booking_history') # Redirect back to history
+    else:
+        # GET request: Show the form pre-filled with the booking's current data
+        form = BookingForm(instance=booking) 
+
+    context = {
+        'form': form,
+        'booking': booking, # Pass the booking object itself
+        'class': class_booked # Pass the related class object
+    }
+    # You might need a new template for editing, or reuse/adapt checkout.html
+    # Let's assume a new template for clarity: 'checkout/edit_booking.html'
+    return render(request, 'checkout/edit_booking.html', context)

@@ -51,7 +51,7 @@
                                 <button type="submit" class="btn btn-delete">Delete</button> {# Added btn class #}
                             </form>
                             {# Add specific class for Edit button styling #}
-                            <button class="btn btn-edit">Edit</button> {# Added btn class #}
+                            <a href="{% url 'checkout:edit_booking' booking.id %}" class="btn btn-edit">Edit</a>
                         </div>
                     </div>
                 </div>
