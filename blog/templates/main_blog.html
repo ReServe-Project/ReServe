@@ -45,7 +45,30 @@
             </a>
         {% endif %}
     </div>
-
+    <!-- Add at the top of your blog list section -->
+    <div class="flex items-center justify-center my-0">
+      <div class="bg-white rounded-full shadow flex items-center px-4 py-2 space-x-4" style="box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+        <a href="?filter=all"
+           class="px-8 py-3 rounded-full font-semibold transition
+                  {% if filter_type == 'all' %}
+                    bg-[#A34B23] text-white border-2 border-[#A34B23]
+                  {% else %}
+                    bg-[#F7F4EC] text-[#6B4F2A] border-2 border-[#A34B23]
+                  {% endif %}">
+          All Blogs
+        </a>
+        <span class="h-8 w-px bg-[#434162]"></span>
+        <a href="?filter=my"
+           class="px-8 py-3 rounded-full font-semibold transition
+                  {% if filter_type == 'my' %}
+                    bg-[#A34B23] text-white border-2 border-[#A34B23]
+                  {% else %}
+                    bg-[#F7F4EC] text-[#6B4F2A] border-2 border-[#A34B23]
+                  {% endif %}">
+          My Blogs
+        </a>
+      </div>
+    </div>
     {% if not blog_list %}
         <p class="text-center text-slate-500 mt-16">No data available in Blog.</p>
     {% else %}

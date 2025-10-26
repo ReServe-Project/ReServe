@@ -8,12 +8,15 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 def main_blog(request):
-    blog_list = Blog.objects.all()
-
+    filter_type = request.GET.get('filter', 'all') 
+    if filter_type == 'my':
+        blog_list = Blog.objects.filter(user=request.user)
+    else:
+        blog_list = Blog.objects.all()
     context = {
-        'blog_list': blog_list
+        'blog_list': blog_list,
+        'filter_type': filter_type,
     }
-
     return render(request, "main_blog.html", context)
 
 def create_blog(request):
