@@ -46,11 +46,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'main',
-    'home_search',
     'accounts',
-    'product_details',
+    'home_search',
     'blog',
-    'checkout',
+    'PersonalGoals',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    <h1>Main Page</h1>
+    <a href="{% url 'goals:calendar_today' %}">Go to Personal Goals</a>
+    <br><br>
+    <a href="{% url 'main:logout' %}" class="logout-btn">Logout</a>
+</div>
+{% endblock content %}
