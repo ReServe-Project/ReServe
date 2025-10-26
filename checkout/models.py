@@ -15,7 +15,7 @@ class Booking(models.Model):
     # --- Add these new fields ---
     full_name = models.CharField(max_length=255)
     email = models.EmailField()
-    phone_number = models.IntegerField(max_length=20)
+    phone_number = models.IntegerField()
     # --- End of new fields ---
 
     participants = models.PositiveIntegerField(default=1)
