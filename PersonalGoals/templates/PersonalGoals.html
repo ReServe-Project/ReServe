@@ -77,11 +77,8 @@
           <div class="absolute z-20" style="right: 480px; top: -0px;">
             <div class="w-[109px] h-[109px] rounded-full overflow-hidden ring-4 ring-[#E86C2A] bg-gray-200">
               {% if user.is_authenticated and user.avatar %}
-                <img
-                  src="{{ user.avatar.url }}"
-                  alt="{{ user.display_label|default:user.username }}'s avatar"
-                  class="w-full h-full object-cover"
-                />
+                {# If user has uploaded or default is set, this never errors #}
+                  <img src="{{ request.user.avatar.url }}" alt="Avatar" class="w-full h-full object-cover">
               {% else %}
                 <img
                   src="{{ MEDIA_URL }}avatars/default.png"

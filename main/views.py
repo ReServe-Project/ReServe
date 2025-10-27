@@ -43,8 +43,3 @@ def logout_user(request):
     response.delete_cookie('last_login')
     return response
 
-def show_main(request):
-    context = {
-        'last_login': request.COOKIES.get('last_login', ''),
-    }
-    return render(request, 'main.html', context)

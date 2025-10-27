@@ -9,18 +9,21 @@ from django.views.decorators.http import require_http_methods, require_POST
 import json
 from .models import PersonalGoal
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.templatetags.static import static
+
 # Create your views here.
 def _month_nav(year:int, month:int):
     prev_y, prev_m = (year-1, 12) if month == 1 else (year, month-1)
     next_y, next_m = (year+1, 1) if month == 12 else (year, month+1)
     return prev_y, prev_m, next_y, next_m
 
-@login_required(login_url='/login/')
+@login_required()
 def calendar_today(request):
     today = datetime.now()
     return calendar_month(request, today.year, today.month)
 
-@login_required(login_url='/login/')
+@login_required()
 def calendar_month(request, year, month):
     # Get calendar data
     cal = calendar.monthcalendar(year, month)
@@ -79,7 +82,7 @@ def calendar_month(request, year, month):
         'prev_month': prev_month,
         'prev_year': prev_year,
         'next_month': next_month,
-        'next_year': next_year
+        'next_year': next_year,
     }
     
     return render(request, 'PersonalGoals.html', context)
