@@ -1,16 +1,15 @@
-# home_search/views.py
-
 from django.db.models import Q
 from django.shortcuts import render
 from django.core.paginator import Paginator
-
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-
 from .models import Class, CATEGORY_CHOICES
 from .forms import ClassForm
-from .utils import is_instructor   # ← use the ONE canonical checker
+from .utils import is_instructor  
+from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import render
+
 
 
 # --------------------------- Pages ---------------------------
@@ -88,11 +87,64 @@ class ClassDetailView(DetailView):
         context["user_review"] = user_review
         return context
 
+class AjaxFormMixin:
+    ajax_template_name = None  # set in subclass
 
-class ClassCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    def get_template_names(self):
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest" and self.ajax_template_name:
+            return [self.ajax_template_name]
+        return [self.template_name]
+
+    def form_invalid(self, form):
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
+            # Re-render the modal with errors (still HTML)
+            return render(
+                self.request,
+                self.get_template_names()[0],
+                self.get_context_data(form=form),
+                status=400,
+            )
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse(
+                {
+                    "success": True,
+                    "redirect_url": self.get_success_url(),
+                }
+            )
+        return response
+
+
+class AjaxDeleteMixin:
+    ajax_template_name = None
+
+    def get_template_names(self):
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest" and self.ajax_template_name:
+            return [self.ajax_template_name]
+        return [self.template_name]
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.delete()
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse(
+                {
+                    "success": True,
+                    "redirect_url": success_url,
+                }
+            )
+        return HttpResponseRedirect(success_url)
+
+
+class ClassCreateView(LoginRequiredMixin, UserPassesTestMixin, AjaxFormMixin, CreateView):
     model = Class
     form_class = ClassForm
     template_name = "home_search/class_form.html"
+    ajax_template_name = "home_search/class_form_modal.html"
     success_url = reverse_lazy("home_search:search")
 
     def test_func(self):
@@ -112,10 +164,11 @@ class ClassCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return ctx
 
 
-class ClassUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class ClassUpdateView(LoginRequiredMixin, UserPassesTestMixin, AjaxFormMixin, UpdateView):
     model = Class
     form_class = ClassForm
     template_name = "home_search/class_form.html"
+    ajax_template_name = "home_search/class_form_modal.html"
     success_url = reverse_lazy("home_search:search")
 
     def test_func(self):
@@ -128,7 +181,8 @@ class ClassUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return ctx
 
 
-class ClassDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
+class ClassDeleteView(LoginRequiredMixin, OwnerRequiredMixin, AjaxDeleteMixin, DeleteView):
     model = Class
     template_name = "home_search/class_confirm_delete.html"
-    success_url = reverse_lazy("home_search:search")  # back to the grid
+    ajax_template_name = "home_search/class_confirm_delete_modal.html"
+    success_url = reverse_lazy("home_search:search")
