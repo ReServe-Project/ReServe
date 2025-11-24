@@ -76,6 +76,16 @@ class ClassDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["reviews"] = Review.objects.filter(class_item=self.object)
+
+        user_review = None
+        user = self.request.user
+        if user.is_authenticated:
+            try:
+                user_review = Review.objects.get(class_item=self.object, user=user)
+            except Review.DoesNotExist:
+                user_review = None
+        
+        context["user_review"] = user_review
         return context
 
 

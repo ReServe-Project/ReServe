@@ -15,15 +15,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Blog',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200)),
-                ('date_blog', models.DateField()),
-                ('time_blog', models.TimeField(auto_now_add=True)),
-            ],
-        ),
-        migrations.CreateModel(
             name='PersonalGoal',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -31,11 +22,11 @@ class Migration(migrations.Migration):
                 ('date', models.DateField()),
                 ('is_completed', models.BooleanField(default=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='personal_goals', to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'ordering': ['date', 'id'],
-                'indexes': [models.Index(fields=['user', 'date'], name='main_person_user_id_458b8d_idx')],
+                'indexes': [models.Index(fields=['user', 'date'], name='PersonalGoa_user_id_c0d3c9_idx')],
             },
         ),
     ]

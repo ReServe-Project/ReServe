@@ -6,7 +6,6 @@ from django.db.models import Avg
 from home_search.models import Class
 from .models import Review
 
-
 @login_required
 def add_review(request, pk):
     class_item = get_object_or_404(Class, id=pk)
@@ -27,16 +26,23 @@ def add_review(request, pk):
 
         # Recalculate average rating dynamically
         avg_rating = Review.objects.filter(class_item=class_item).aggregate(avg=Avg("rating"))["avg"] or 0
-        avg_rating = round(avg_rating, 1)
+        class_item.average_rating = round(avg_rating, 1)
 
-        # Attach it temporarily for the template
-        class_item.average_rating = avg_rating
-
-        # Return the updated HTML fragment
+        # Render the updated reviews list
         html = render_to_string("_reviews_list.html", {"c": class_item, "user": request.user})
-        return HttpResponse(html)
+
+        # Return JSON with HTML and user review data
+        return JsonResponse({
+            "html": html,
+            "user_review_data": {
+                "id": review.id,
+                "rating": review.rating,
+                "comment": review.comment
+            }
+        })
 
     return HttpResponseForbidden("Invalid request method")
+
 
 
 @login_required

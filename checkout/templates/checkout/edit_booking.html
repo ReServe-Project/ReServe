@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+    <title>Edit Booking</title>
+    {# You might reuse checkout.css or create edit_booking.css #}
+    <link rel="stylesheet" href="{% static 'css/checkout.css' %}"> 
+{% endblock meta %}
+
+{% block content %}
+<div class="checkout-container"> {# Reusing checkout container style #}
+    
+    <div class="checkout-header"> {# Reusing checkout header style #}
+        {# Link back to history page maybe? Or use JS back button #}
+        <a href="{% url 'checkout:booking_history' %}" class="back-button"> 
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </a>
+        <h1 class="checkout-title">Edit Booking</h1> {# Changed title #}
+    </div>
+
+    <div class="booking-details-card" style="margin: 0 auto; max-width: 600px;"> {# Center the form card #}
+        <form method="POST"> {# No ID needed if only one form #}
+            {% csrf_token %}
+            
+            {# Display read-only class name #}
+            <div class="form-group">
+                <label>Class Name</label>
+                <input type="text" value="{{ class.name }}" readonly class="form-control" />
+            </div>
+
+            {# Display editable fields using the form passed from the view #}
+            <div class="form-group">
+                <label for="{{ form.full_name.id_for_label }}">Full Name</label>
+                {{ form.full_name }}
+                {% if form.full_name.errors %}
+                    <div class="error">{{ form.full_name.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                    {{ form.phone_number }}
+                     {% if form.phone_number.errors %}
+                        <div class="error">{{ form.phone_number.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group half-width">
+                    <label for="{{ form.email.id_for_label }}">Email</label>
+                    {{ form.email }}
+                     {% if form.email.errors %}
+                        <div class="error">{{ form.email.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Add a submit button #}
+            <div style="text-align: right; margin-top: 20px;">
+                 <button type="submit" class="confirm-button">Save Changes</button> {# Reusing confirm button style #}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}
