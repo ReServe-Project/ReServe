@@ -34,7 +34,6 @@
 
     <!-- Add / Update Review Button -->
     {% if user.is_authenticated and user.role == "member" %}
-      {% comment %} We'll prefill these with JS on page load {% endcomment %}
       <button id="addReviewBtn"
               class="inline-block px-6 py-2.5 rounded-2xl bg-[#4C4974] text-white font-semibold shadow-sm hover:brightness-110"
               data-rating=""
