@@ -60,10 +60,11 @@
 {# Create Class button (UNDER chips) — only for instructors #}
 {% if show_create_button %}
   <div class="relative z-50 mt-4 flex justify-center pointer-events-none">
-    <a href="{% url 'home_search:class_create' %}"
-       class="inline-flex items-center px-5 py-2 rounded-full bg-[#603A22] text-white font-semibold shadow pointer-events-auto">
-      + Create Class
-    </a>
+    <a href="#"
+   data-url="{% url 'home_search:class_create' %}"
+   class="js-open-class-modal inline-flex items-center px-5 py-2 rounded-full bg-[#603A22] text-white font-semibold shadow pointer-events-auto">
+  + Create Class
+</a>
   </div>
 {% endif %}
 
@@ -93,28 +94,29 @@
                 <p class="text-sm text-[#575757] mt-1">Rp {{ c.price|intcomma }}</p>
               </div>
 
-              {% if request.user.is_authenticated and c.owner_id == request.user.id %}
-                {# Owner view: Delete / Edit / Details #}
-                <div class="px-2 pb-2 grid grid-cols-3 gap-2 mt-auto">
-                  <form action="{% url 'home_search:class_delete' pk=c.pk %}" method="post"
-                        onsubmit="return confirm('Delete this class?')">
-                    {% csrf_token %}
-                    <button class="w-full px-3 py-2 rounded-lg bg-[#E6554A] text-white text-sm font-semibold">
-                      Delete
-                    </button>
-                  </form>
+             {% if request.user.is_authenticated and c.owner_id == request.user.id %}
+  {# Owner view: Delete / Edit / Details (AJAX modals) #}
+  <div class="px-2 pb-2 grid grid-cols-3 gap-2 mt-auto">
+    <button type="button"
+            data-url="{% url 'home_search:class_delete' pk=c.pk %}"
+            class="js-open-delete-modal w-full px-3 py-2 rounded-lg bg-[#E6554A] text-white text-sm font-semibold">
+      Delete
+    </button>
 
-                  <a href="{% url 'home_search:class_edit' pk=c.pk %}"
-                     class="w-full text-center px-3 py-2 rounded-lg bg-[#2F6FED] text-white text-sm font-semibold">
-                    Edit
-                  </a>
+    <button type="button"
+            data-url="{% url 'home_search:class_edit' pk=c.pk %}"
+            class="js-open-class-modal w-full px-3 py-2 rounded-lg bg-[#2F6FED] text-white text-sm font-semibold">
+      Edit
+    </button>
 
-                  <a href="{% url 'home_search:class_detail' pk=c.pk %}"
-                     class="w-full text-center px-3 py-2 rounded-lg bg-[#E98049] text-white text-sm font-semibold">
-                    Details
-                  </a>
-                </div>
-              {% else %}
+    <a href="{% url 'home_search:class_detail' pk=c.pk %}"
+       class="w-full text-center px-3 py-2 rounded-lg bg-[#E98049] text-white text-sm font-semibold">
+      Details
+    </a>
+  </div>
+{% else %}
+
+
                 {# Non-owner (incl. members): Details only #}
                 <div class="px-2 pb-2 mt-auto">
                   <a href="{% url 'home_search:class_detail' pk=c.pk %}"
@@ -133,6 +135,121 @@
     </div>
   </div>
 </section>
+
+{# Modal container #}
+<div id="class-modal"
+     class="fixed inset-0 z-[999] hidden bg-black/40 items-center justify-center">
+  <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b px-5 py-3">
+      <h2 id="class-modal-title" class="text-lg font-semibold">Loading...</h2>
+      <button id="class-modal-close" class="text-2xl leading-none text-gray-500 hover:text-gray-700">&times;</button>
+    </div>
+    <div id="class-modal-body" class="p-5">
+      <!-- AJAX content -->
+    </div>
+  </div>
+</div>
+
+{% endblock %} {# end of content block #}
+
+{% block scripts %}
+  {{ block.super }}
+  <script>
+    (function () {
+      const modal = document.getElementById('class-modal');
+      const modalBody = document.getElementById('class-modal-body');
+      const modalTitle = document.getElementById('class-modal-title');
+      const closeBtn = document.getElementById('class-modal-close');
+
+      if (!modal) return;
+
+      function showModal() {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+
+      function hideModal() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        modalBody.innerHTML = '';
+      }
+
+      function attachFormHandler(form, url) {
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const fd = new FormData(form);
+
+    fetch(url, {   
+      method: form.method || 'POST',
+      body: fd,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.redirect_url) {
+          window.location.href = data.redirect_url;
+        } else {
+          window.location.reload();
+        }
+      })
+      .catch(() => window.location.reload());
+  });
+}
+
+
+      function loadModal(url, isDelete) {
+        showModal();
+        modalTitle.textContent = isDelete ? 'Delete Class' : 'Class Form';
+        modalBody.innerHTML = '<p class="text-sm text-gray-500">Loading...</p>';
+
+        fetch(url, {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+        })
+          .then(r => r.text())
+          .then(html => {
+            modalBody.innerHTML = html;
+
+            const h = modalBody.querySelector('h1, h2');
+            if (h) {
+              modalTitle.textContent = h.textContent.trim();
+            }
+
+            const form = modalBody.querySelector('form');
+            if (form) {
+              attachFormHandler(form, url);
+            }
+
+            const cancelBtn = modalBody.querySelector('#class-delete-cancel');
+            if (cancelBtn) {
+              cancelBtn.addEventListener('click', hideModal);
+            }
+          });
+      }
+
+      document.addEventListener('click', function (e) {
+        const createEditBtn = e.target.closest('.js-open-class-modal');
+        const deleteBtn = e.target.closest('.js-open-delete-modal');
+
+        if (createEditBtn) {
+          e.preventDefault();
+          loadModal(createEditBtn.dataset.url, false);
+        } else if (deleteBtn) {
+          e.preventDefault();
+          loadModal(deleteBtn.dataset.url, true);
+        }
+      });
+
+      closeBtn && closeBtn.addEventListener('click', hideModal);
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) hideModal();
+      });
+    })();
+  </script>
+
 
 {% endblock %}
 
