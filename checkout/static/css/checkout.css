@@ -1,0 +1,169 @@
+/* checkout/static/css/checkout.css */
+
+/* Main container for the whole checkout box */
+.checkout-container {
+    max-width: 900px; /* Max width of the entire component */
+    margin: 40px auto; /* Center it on the page with space from the navbar */
+    padding: 24px;
+    position: relative;
+}
+
+/* Header: "Checkout" title and back button */
+.checkout-header {
+    display: flex;         /* This makes items go side-by-side */
+    align-items: center;   /* This vertically aligns them */
+    gap: 16px;             /* This adds space between them */
+    margin-bottom: 24px;   /* Space below the header */
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%; /* Makes it a circle */
+    border: 1px solid #E0E0E0;
+    background-color: #fff;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover {
+    background-color: #f5f5f5;
+}
+
+.checkout-title {
+    font-size: 2.25rem; /* 36px */
+    font-weight: bold;  /* Or use 700 */
+    color: #4C4974;     /* Dark purple from your design */
+    /* Keep any other existing properties like margin */
+}
+
+/* Flex container for the two columns */
+.checkout-content {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+}
+
+/* Left column: Booking Details */
+.booking-details-card {
+    flex: 2; /* Takes up 2/3 of the space */
+    background-color: #ffffff;
+    border: 1px solid #E0E0E0;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Right column: Payment Card */
+.payment-card {
+    flex: 1; /* Takes up 1/3 of the space */
+    background-color: #ffffff;
+    border: 1px solid #E0E0E0;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    /* We add text-align: center to center the QR code and button */
+    text-align: center;
+    overflow: hidden; /* Keeps the header inside the rounded corners */
+}
+
+.payment-card h2 {
+    /* This is the "QRIS Payment Only" header */
+    background-color: #4C4974; /* Dark purple from your design */
+    color: white;
+    font-size: 1.125rem; /* 18px */
+    font-weight: 600;
+    padding: 16px;
+    margin: 0; /* Remove default margin */
+}
+
+/* Form Styling */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+    font-size: 0.875rem; /* 14px */
+}
+
+/* This styles your Django form fields */
+.form-group input,
+.form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box; /* IMPORTANT */
+}
+
+input[type="text"][readonly] {
+    background-color: #f4f4f5; /* Lighter gray for readonly */
+    cursor: not-allowed;
+    color: #777;
+}
+
+/* Container for Phone and Email */
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-row .half-width {
+    flex: 1; /* Each takes half the space */
+}
+
+/* Payment Card Content */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px 0;
+}
+
+.checkbox-group label {
+    font-size: 0.875rem;
+    color: #333;
+}
+
+#qris_details {
+    padding: 0 24px 24px 24px; /* Padding for the QR/button */
+}
+
+.qris-image-placeholder {
+    margin-bottom: 20px;
+}
+
+.qris-image-placeholder img {
+    width: 150px;
+    height: 150px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.confirm-button {
+    width: 100%;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    /* CHANGE: Background color to orange */
+    background-color: #F97316;
+    color: white; /* Make sure text is white */
+    border: none; /* Remove border if you used gray */
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+/* CHANGE/ADD: Hover state for the button */
+.confirm-button:hover {
+    background-color: #EA580C; /* Slightly darker orange */
+}

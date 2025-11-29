@@ -1,0 +1,72 @@
+{# Only the inside of the modal, no <html>, no navbar #}
+<form method="post" action="" class="space-y-6" id="class-form">
+  {% csrf_token %}
+
+  <div>
+    <label class="block text-sm font-semibold text-[#575757] mb-2">Category</label>
+    <select name="category" required
+            class="w-full rounded-xl border border-black/10 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#6B3925]">
+      {% for key,label in categories %}
+        <option value="{{ key }}" {% if object.category == key %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-[#575757] mb-2">CLASS NAME</label>
+    <input name="name" type="text" required
+           value="{{ object.name|default_if_none:'' }}"
+           placeholder="e.g., Beginner Yoga Flow"
+           class="w-full rounded-xl border border-black/10 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#6B3925]">
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-[#575757] mb-2">Instructor</label>
+    <div class="w-full rounded-xl border border-black/10 px-4 py-2.5 bg-gray-50 text-[#1B1C22]">
+      {{ request.user.get_full_name|default:request.user.username }}
+    </div>
+    <p class="text-xs text-[#8c8c8c] mt-1">Saved automatically as the owner.</p>
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-[#575757] mb-2">Price</label>
+    <input name="price" type="number" min="0" step="1" required
+           value="{{ object.price|default_if_none:'0' }}"
+           class="w-full rounded-xl border border-black/10 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#6B3925]">
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-[#575757] mb-2">DATE &amp; TIME</label>
+    <input name="datetime" type="datetime-local"
+           value="{% if object.datetime %}{{ object.datetime|date:'Y-m-d\\TH:i' }}{% endif %}"
+           class="w-full rounded-xl border border-black/10 px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-[#6B3925]" />
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-[#575757] mb-2">Location</label>
+    <input name="location" type="text" placeholder="Studio / Address"
+           value="{{ object.location|default_if_none:'' }}"
+           class="w-full rounded-xl border border-black/10 px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-[#6B3925]" />
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-[#575757] mb-2">Description</label>
+    <textarea name="description" rows="4"
+              class="w-full rounded-xl border border-black/10 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#6B3925]">{{ object.description|default_if_none:'' }}</textarea>
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-[#575757] mb-2">Picture (Image URL)</label>
+    <input name="image_url" type="url" required
+           value="{{ object.image_url|default_if_none:'' }}"
+           placeholder="https://example.com/photo.jpg"
+           class="w-full rounded-xl border border-black/10 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#6B3925]">
+    <p class="text-xs text-[#8c8c8c] mt-1">Paste a direct link to an image.</p>
+  </div>
+
+  <div class="flex items-center gap-3 pt-2">
+    <button class="inline-flex items-center px-5 py-2 rounded-full bg-[#603A22] text-white font-semibold shadow">
+      {{ is_edit|yesno:"Save Changes,Submit" }}
+    </button>
+  </div>
+</form>

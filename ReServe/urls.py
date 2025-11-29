@@ -5,13 +5,17 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('accounts.urls')),
+
     # master added this app routing — keep it
     path('', include(('home_search.urls', 'home_search'))),
     # your existing apps
-    path('', include('accounts.urls')),
-    path('', include('main.urls')),
+
     path('blog/', include('blog.urls')),
-    path('accounts/', include("django.contrib.auth.urls")),
+    path('goals/', include('PersonalGoals.urls')),
+    path('history/', include('checkout.urls')),
+    path('', include('product_details.urls')),
+    path('checkout/', include('checkout.urls')),
 ]
 
 if settings.DEBUG:

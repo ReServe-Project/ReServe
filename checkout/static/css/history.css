@@ -1,0 +1,235 @@
+/* checkout/static/css/history.css */
+
+/* Overall container */
+.history-container {
+    max-width: 1000px; /* Adjust max-width as needed */
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #ffffff; /* White background for the main content area */
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+}
+
+/* Header */
+.history-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.back-button-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #E0E0E0;
+    background-color: #fff;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.back-button-circle:hover {
+    background-color: #f5f5f5;
+}
+
+.history-header h1 {
+    font-size: 2rem; /* Larger title */
+    font-weight: bold; /* Bold title */
+    color: #4C4974; /* PURPLE - as requested */
+    margin: 0; /* Remove default margin for h1 */
+}
+
+/* Layout: Main column and sidebar */
+.history-layout {
+    display: flex;
+    gap: 30px;
+}
+
+.main-column {
+    flex: 3; /* Main column takes more space */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between cards */
+}
+
+.sidebar-column {
+    flex: 1; /* Sidebar takes less space */
+}
+
+/* Individual Booking Card */
+.booking-card {
+    display: flex;
+    align-items: center; /* Vertically align items */
+    gap: 20px;
+    background-color: #f9f9f9; /* Light grey background for card */
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card-image img {
+    width: 100px; /* Adjust image size */
+    height: 75px;
+    object-fit: cover; /* Ensure image covers the area nicely */
+    border-radius: 6px;
+    display: block;
+}
+.image-placeholder {
+    width: 100px;
+    height: 75px;
+    background-color: #e0e0e0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 0.8em;
+}
+
+
+.card-content {
+    flex-grow: 1; /* Allows title to take available space */
+    /* NEW: Ensure this section can take horizontal space */
+}
+
+.card-title {
+    font-size: 1.5rem; /* BIGGER - 24px */
+    font-weight: bold; /* BOLDER */
+    color: #F97316; /* BROWN/ORANGE - as requested */
+    margin: 0; /* Remove default margin */
+}
+
+.card-info-actions {
+    display: flex;
+    flex-direction: column; /* Stack details and actions vertically */
+    /* Remove align-items: flex-end; from here */
+    gap: 10px;
+    margin-left: auto; /* Pushes this block to the far right */
+    text-align: right; /* Align text inside to the right */
+}
+
+.card-details {
+    /* NEW: Ensure details stay together and align right */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Align date/location to the right */
+}
+
+.card-details p {
+    margin: 0;
+    font-size: 0.875rem; /* Smaller text for details */
+    color: #666;
+}
+
+/* ADD THESE RULES TO THE END OF YOUR history.css FILE */
+
+.card-actions {
+    display: flex; /* Makes buttons go side-by-side */
+    gap: 10px;
+    justify-content: flex-end; /* Aligns buttons to the right */
+}
+
+/* General Button Styles */
+.btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+    color: white; /* Text color is white */
+    display: inline-block; /* Ensure they are displayed */
+}
+
+.btn-delete {
+    background-color: #EF4444; /* Red background */
+}
+.btn-delete:hover {
+    background-color: #DC2626; /* Darker Red */
+}
+
+.btn-edit {
+    background-color: #3B82F6; /* Blue background */
+}
+.btn-edit:hover {
+    background-color: #2563EB; /* Darker Blue */
+}
+
+/* Sidebar "Explore More" Card */
+.explore-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    text-align: center; /* Ensures button aligns center */
+}
+
+.explore-card img {
+    width: 100%;
+    height: 120px; /* Adjust height */
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.explore-card h3 {
+    font-size: 1.1rem;
+    font-weight: bold; /* BOLD - as requested */
+    margin-bottom: 15px;
+    color: #4C4974; /* PURPLE - as requested */
+}
+
+/* Sidebar "Explore More" Card Button */
+.btn-explore {
+    display: inline-block;
+    background-color: #F97316; /* Orange background */
+    color: white; /* White text */
+    padding: 10px 20px;
+    border-radius: 20px; /* Pill shape */
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.btn-explore:hover {
+    background-color: #EA580C; /* Darker Orange */
+}
+
+/* Message Styling (Optional) */
+.messages {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+.messages li {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+.messages li.success {
+    background-color: #D1FAE5; /* Light green */
+    color: #065F46; /* Dark green */
+    border: 1px solid #A7F3D0;
+}
+.messages li.error {
+    background-color: #FEE2E2; /* Light red */
+    color: #991B1B; /* Dark red */
+    border: 1px solid #FECACA;
+}
+
+.card-user-info {
+    margin: 5px 0 0 0; /* Add a little space above, remove default bottom margin */
+    font-size: 0.875rem; /* Same size as date/location */
+    color: #666;        /* Same color as date/location */
+    font-weight: normal; /* Ensure it's not bold if h3 styling cascades */
+}
