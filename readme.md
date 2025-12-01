@@ -120,5 +120,4 @@ V. Links
         https://khayru-rafa-reserve.pbp.cs.ui.ac.id
 - Design:
         https://www.figma.com/team_invite/redeem/ofrpzmgVMDOn9n8CVpSdHt 
-
-<!-- README -->
+        
