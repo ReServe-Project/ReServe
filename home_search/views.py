@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Q, Avg, Count
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -9,6 +9,7 @@ from .forms import ClassForm
 from .utils import is_instructor  
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
+from product_details.models import Review
 
 
 
@@ -65,8 +66,6 @@ class OwnerRequiredMixin(UserPassesTestMixin):
         return self.request.user.is_authenticated and obj.owner_id == self.request.user.id
 
 
-from product_details.models import Review  # import your model
-
 class ClassDetailView(DetailView):
     model = Class
     template_name = "home_search/class_detail.html"
@@ -74,8 +73,29 @@ class ClassDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        # reviews queryset
         context["reviews"] = Review.objects.filter(class_item=self.object)
 
+        # compute and expose average rating (do not need to persist here)
+        avg = Review.objects.filter(class_item=self.object).aggregate(avg=Avg('rating'))['avg'] or 0
+        self.object.average_rating = round(avg, 1)
+
+        # build per-star counts (1..3 scale used in templates)
+        qs = Review.objects.filter(class_item=self.object).values('rating').annotate(count=Count('id'))
+        rating_summary = {i: 0 for i in range(1, 4)}
+        total_reviews = 0
+        for row in qs:
+            r = int(row['rating'])
+            c = row['count']
+            if 1 <= r <= 3:
+                rating_summary[r] = c
+                total_reviews += c
+
+        context["rating_summary"] = rating_summary
+        context["total_reviews"] = total_reviews
+
+        # existing user_review logic
         user_review = None
         user = self.request.user
         if user.is_authenticated:
@@ -83,7 +103,7 @@ class ClassDetailView(DetailView):
                 user_review = Review.objects.get(class_item=self.object, user=user)
             except Review.DoesNotExist:
                 user_review = None
-        
+
         context["user_review"] = user_review
         return context
 

@@ -94,7 +94,7 @@
     <div class="modal-box">
         <h3 style="color: green;">Success!</h3>
         <p id="successMessage">Your booking was updated.</p>
-        <button class="modal-btn" onclick="closeSuccessModal()">OK</button>
+        <button class="modal-btn" onclick="redirectToHistory()" >OK</button>
     </div>
 </div>
 
@@ -130,6 +130,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.target === successModal) closeSuccess();
         if (e.target === errorModal) closeError();
     });
+
+    const redirectToHistory = () => {
+        window.location.href = "{% url 'checkout:booking_history' %}";
+    };
+    window.redirectToHistory = redirectToHistory;
 
     // Submit AJAX (JSON)
     form?.addEventListener("submit", async (e) => {
