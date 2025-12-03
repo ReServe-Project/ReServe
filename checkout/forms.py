@@ -24,7 +24,6 @@ class BookingForm(forms.ModelForm):
         widgets = {
             'full_name': forms.TextInput(attrs={'placeholder': 'Enter your full name'}),
             'email': forms.EmailInput(attrs={'placeholder': 'user@gmail.com'}),
-            'phone_number': forms.TextInput(attrs={'placeholder': 'Ex: 81234567890'}),
         }
 
     def __init__(self, *args, **kwargs):
