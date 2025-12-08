@@ -5,6 +5,7 @@ from django.db import models
 from accounts.models import User 
 # FIX 2: Import the 'Class' model from 'home_search', not 'product_details'
 from home_search.models import Class 
+from django.core.validators import RegexValidator
 
 class Booking(models.Model):
     # FIX 3: Point to the correct User model
@@ -15,7 +16,15 @@ class Booking(models.Model):
     # --- Add these new fields ---
     full_name = models.CharField(max_length=255)
     email = models.EmailField()
-    phone_number = models.IntegerField()
+    phone_number = models.CharField(
+    max_length=11,
+    validators=[
+        RegexValidator(
+            regex=r'^\d{11}$',
+            message="Phone number must contain exactly 11 digits."
+        )
+    ]
+)
     # --- End of new fields ---
 
     participants = models.PositiveIntegerField(default=1)

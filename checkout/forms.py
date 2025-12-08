@@ -11,7 +11,12 @@ class BookingForm(forms.ModelForm):
         widgets = {
             'full_name': forms.TextInput(attrs={'placeholder': 'Enter your full name'}),
             'email': forms.EmailInput(attrs={'placeholder': 'user@gmail.com'}),
-            'phone_number': forms.NumberInput(attrs={'placeholder': 'Enter your phone number'}),
+            'phone_number': forms.TextInput(attrs={'placeholder': 'Enter your phone number, must be 11 digits',
+                                                    'pattern': r'\d{11}',
+                                                    'title': 'Phone number must be exactly 11 digits',
+                                                    'inputmode': 'numeric',
+})
+
         }
 
     def __init__(self, *args, **kwargs):
