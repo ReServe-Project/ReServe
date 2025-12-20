@@ -19,7 +19,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+AUTH_USER_MODEL = 'accounts.User'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -35,9 +35,6 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "khayru-rafa-reserve.pbp.cs.ui.ac.id"
 CSRF_TRUSTED_ORIGINS = [
     "https://khayru-rafa-reserve.pbp.cs.ui.ac.id"
 ]
-
-AUTH_USER_MODEL = 'accounts.User'
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -49,8 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'main',
-    'home_search',
     'accounts',
+    'home_search',
     'blog',
     'PersonalGoals',
     'product_details',
@@ -67,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'ReServe.urls'
@@ -81,6 +79,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -171,8 +170,12 @@ LOGOUT_REDIRECT_URL = "login"
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / "staticfiles"  # or os.path.join(BASE_DIR, "staticfiles")
+
+# STATICFILES_DIRS — source/static locations you edit during development
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # do NOT include STATIC_ROOT here
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

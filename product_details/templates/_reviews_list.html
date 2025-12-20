@@ -1,0 +1,33 @@
+{% for review in c.reviews.all %}
+  <div class="p-4 bg-gray-50 rounded-xl border border-gray-200">
+    <div class="flex items-center justify-between mb-1">
+      <div>
+        <p class="font-semibold">{{ review.user.username }}</p>
+        <div class="text-yellow-500 text-sm">
+          {% for i in "123"|make_list %}
+            {% if i|add:0 <= review.rating %}
+              ★
+            {% else %}
+              ☆
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Only show for the owner -->
+      {% if user == review.user %}
+        <div class="flex items-center gap-2">
+          <button
+            class="text-sm text-red-600 hover:underline deleteReviewBtn"
+            data-id="{{ review.id }}">
+            Delete
+          </button>
+        </div>
+      {% endif %}
+    </div>
+
+    <p class="text-gray-700 text-sm">{{ review.comment }}</p>
+  </div>
+{% empty %}
+  <p class="text-gray-500 italic">No reviews yet.</p>
+{% endfor %}

@@ -1,16 +1,16 @@
-# home_search/views.py
-
-from django.db.models import Q
+from django.db.models import Q, Avg, Count
 from django.shortcuts import render
 from django.core.paginator import Paginator
-
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-
 from .models import Class, CATEGORY_CHOICES
 from .forms import ClassForm
-from .utils import is_instructor   # ← use the ONE canonical checker
+from .utils import is_instructor  
+from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import render
+from product_details.models import Review
+
 
 
 # --------------------------- Pages ---------------------------
@@ -71,11 +71,100 @@ class ClassDetailView(DetailView):
     template_name = "home_search/class_detail.html"
     context_object_name = "c"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-class ClassCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+        # reviews queryset
+        context["reviews"] = Review.objects.filter(class_item=self.object)
+
+        # compute and expose average rating (do not need to persist here)
+        avg = Review.objects.filter(class_item=self.object).aggregate(avg=Avg('rating'))['avg'] or 0
+        self.object.average_rating = round(avg, 1)
+
+        # build per-star counts (1..3 scale used in templates)
+        qs = Review.objects.filter(class_item=self.object).values('rating').annotate(count=Count('id'))
+        rating_summary = {i: 0 for i in range(1, 4)}
+        total_reviews = 0
+        for row in qs:
+            r = int(row['rating'])
+            c = row['count']
+            if 1 <= r <= 3:
+                rating_summary[r] = c
+                total_reviews += c
+
+        context["rating_summary"] = rating_summary
+        context["total_reviews"] = total_reviews
+
+        # existing user_review logic
+        user_review = None
+        user = self.request.user
+        if user.is_authenticated:
+            try:
+                user_review = Review.objects.get(class_item=self.object, user=user)
+            except Review.DoesNotExist:
+                user_review = None
+
+        context["user_review"] = user_review
+        return context
+
+class AjaxFormMixin:
+    ajax_template_name = None  # set in subclass
+
+    def get_template_names(self):
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest" and self.ajax_template_name:
+            return [self.ajax_template_name]
+        return [self.template_name]
+
+    def form_invalid(self, form):
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
+            # Re-render the modal with errors (still HTML)
+            return render(
+                self.request,
+                self.get_template_names()[0],
+                self.get_context_data(form=form),
+                status=400,
+            )
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse(
+                {
+                    "success": True,
+                    "redirect_url": self.get_success_url(),
+                }
+            )
+        return response
+
+
+class AjaxDeleteMixin:
+    ajax_template_name = None
+
+    def get_template_names(self):
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest" and self.ajax_template_name:
+            return [self.ajax_template_name]
+        return [self.template_name]
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.delete()
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse(
+                {
+                    "success": True,
+                    "redirect_url": success_url,
+                }
+            )
+        return HttpResponseRedirect(success_url)
+
+
+class ClassCreateView(LoginRequiredMixin, UserPassesTestMixin, AjaxFormMixin, CreateView):
     model = Class
     form_class = ClassForm
     template_name = "home_search/class_form.html"
+    ajax_template_name = "home_search/class_form_modal.html"
     success_url = reverse_lazy("home_search:search")
 
     def test_func(self):
@@ -95,10 +184,11 @@ class ClassCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return ctx
 
 
-class ClassUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class ClassUpdateView(LoginRequiredMixin, UserPassesTestMixin, AjaxFormMixin, UpdateView):
     model = Class
     form_class = ClassForm
     template_name = "home_search/class_form.html"
+    ajax_template_name = "home_search/class_form_modal.html"
     success_url = reverse_lazy("home_search:search")
 
     def test_func(self):
@@ -111,7 +201,8 @@ class ClassUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return ctx
 
 
-class ClassDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
+class ClassDeleteView(LoginRequiredMixin, OwnerRequiredMixin, AjaxDeleteMixin, DeleteView):
     model = Class
     template_name = "home_search/class_confirm_delete.html"
-    success_url = reverse_lazy("home_search:search")  # back to the grid
+    ajax_template_name = "home_search/class_confirm_delete_modal.html"
+    success_url = reverse_lazy("home_search:search")

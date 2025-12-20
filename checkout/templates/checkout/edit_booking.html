@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+    <title>Edit Booking</title>
+    <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+    <style>
+        /* Modal styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .modal-box {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            max-width: 350px;
+            text-align: center;
+            animation: pop 0.25s ease-out;
+        }
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-btn {
+            margin-top: 15px;
+            padding: 8px 18px;
+            background: #007bff;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        .modal-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+{% endblock meta %}
+
+{% block content %}
+<div class="checkout-container">
+    
+    <div class="checkout-header">
+        <a href="{% url 'checkout:booking_history' %}" class="back-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </a>
+        <h1 class="checkout-title">Edit Booking</h1>
+    </div>
+
+    <div class="booking-details-card" style="margin: 0 auto; max-width: 600px;">
+        
+        <form method="POST" id="edit-booking-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Class Name</label>
+                <input type="text" value="{{ class.name }}" readonly class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.full_name.id_for_label }}">Full Name</label>
+                {{ form.full_name }}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                    {{ form.phone_number }}
+                </div>
+
+                <div class="form-group half-width">
+                    <label for="{{ form.email.id_for_label }}">Email</label>
+                    {{ form.email }}
+                </div>
+            </div>
+
+            <div style="text-align: right; margin-top: 20px;">
+                <button type="submit" class="confirm-button">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div id="successModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 style="color: green;">Success!</h3>
+        <p id="successMessage">Your booking was updated.</p>
+        <button class="modal-btn" onclick="redirectToHistory()" >OK</button>
+    </div>
+</div>
+
+<!-- ERROR MODAL -->
+<div id="errorModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 style="color: red;">Error</h3>
+        <p id="errorMessage">Something went wrong.</p>
+        <button class="modal-btn" onclick="closeErrorModal()">OK</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    // Elements
+    const form = document.getElementById("edit-booking-form");
+    const successModal = document.getElementById("successModal");
+    const errorModal = document.getElementById("errorModal");
+    const successMessage = document.getElementById("successMessage");
+    const errorMessage = document.getElementById("errorMessage");
+    const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+    // Close buttons for modals
+    const closeSuccess = () => successModal.style.display = "none";
+    const closeError = () => errorModal.style.display = "none";
+
+    window.closeSuccessModal = closeSuccess;
+    window.closeErrorModal = closeError;
+
+    // Click outside modals
+    window.addEventListener("click", (e) => {
+        if (e.target === successModal) closeSuccess();
+        if (e.target === errorModal) closeError();
+    });
+
+    const redirectToHistory = () => {
+        window.location.href = "{% url 'checkout:booking_history' %}";
+    };
+    window.redirectToHistory = redirectToHistory;
+
+    // Submit AJAX (JSON)
+    form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const jsonData = {
+            full_name: document.getElementById("id_full_name").value,
+            phone_number: document.getElementById("id_phone_number").value,
+            email: document.getElementById("id_email").value,
+        };
+
+        try {
+            const response = await fetch("", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+                body: JSON.stringify(jsonData),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                successMessage.textContent = data.message;
+                successModal.style.display = "flex";
+            } else {
+                errorMessage.textContent = data.error || "Validation failed.";
+                errorModal.style.display = "flex";
+            }
+
+        } catch (err) {
+            console.error("AJAX Error:", err);
+            errorMessage.textContent = "Network error occurred!";
+            errorModal.style.display = "flex";
+        }
+    });
+
+});
+</script>
+{% endblock %}
