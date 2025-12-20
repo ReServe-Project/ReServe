@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-87%f6#yh8av!o9h45#vy)8ju0#zx0h(a+32c8-q=&o2f@z34&3
 
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = not PRODUCTION
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "khayru-rafa-reserve.pbp.cs.ui.ac.id"]
 
@@ -52,9 +52,14 @@ INSTALLED_APPS = [
     'home_search',
     'accounts',
     'blog',
+    'PersonalGoals',
+    'product_details',
+    'checkout',
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -129,6 +134,22 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+CORS_ALLOW_CREDENTIALS = True
+
+if DEBUG:
+    # Allow Flutter web dev server (random ports)
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        r"^http:\/\/localhost:\d+$",
+        r"^http:\/\/127\.0\.0\.1:\d+$",
+    ]
+else:
+    # Production: usually no need to allow any browser origins,
+    # unless you host a separate frontend domain that calls this backend.
+    CORS_ALLOWED_ORIGINS = [
+        # Example (ONLY if needed):
+        "https://khayru-rafa-reserve.pbp.cs.ui.ac.id",
+    ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

@@ -9,6 +9,15 @@ urlpatterns = [
     path("register/", views.RegisterView.as_view(), name="register"),
     path("post-login/", views.post_login, name="post_login"),
 
+    path("api/register/", views.api_register, name="api_register"),
+    path("api/login/", views.api_login, name="api_login"),
+    path("api/logout/", views.api_logout, name="api_logout"),
+
+    # PROFILE API (for Flutter)
+    path("api/profile/", views.api_profile, name="api_profile"),
+    path("api/profile/update/", views.api_profile_update, name="api_profile_update"),
+    path("api/profile/avatar/", views.api_profile_avatar, name="api_profile_avatar"),
+
     # PRIVATE PROFILE
     path("profile/", views.ProfileView.as_view(), name="profile_view"),
     path("profile/edit/", views.ProfileEditView.as_view(), name="profile_edit"),
