@@ -50,6 +50,29 @@ def booking_history_view(request):
         'current_filter': status_filter,
     })
 
+@login_required
+def booking_history_api(request):
+    bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')
+
+    data = []
+    for b in bookings:
+        data.append({
+            "id": b.id,
+            "class_name": b.class_booked.name,
+            "full_name": b.full_name,
+            "email": b.email,
+            "phone_number": b.phone_number,
+            "participants": b.participants,
+            "total_price": float(b.total_price),
+            "payment_status": b.payment_status,
+            "booking_date": b.booking_date.isoformat(),
+        })
+
+    return JsonResponse({
+        "success": True,
+        "bookings": data
+    })
+
 
 @require_POST
 @login_required
