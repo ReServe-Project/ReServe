@@ -73,16 +73,14 @@
 
       <!-- RIGHT: Goals panel -->
       <div class="relative w-full">
-          <!-- avatar overlapping the right corner -->
-          <div class="absolute z-20" style="right: 480px; top: -0px;">
+          <!-- avatar overlapping inside the card (connected to accounts) -->
+          <div class="absolute z-20" style="right: 30px; top: -55px;">
             <div class="w-[109px] h-[109px] rounded-full overflow-hidden ring-4 ring-[#E86C2A] bg-gray-200">
-              
-                <img
-                  src="{% static 'accounts/img/avatar-placeholder.png' %}"
-                  alt="Default avatar"
-                  class="w-full h-full object-cover"
-                />
-
+              {% if user.is_authenticated and user.avatar %}
+                <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }} Avatar" class="w-full h-full object-cover">
+              {% else %}
+                <img src="{% static 'accounts/img/avatar-placeholder.png' %}" alt="Default avatar" class="w-full h-full object-cover"/>
+              {% endif %}
             </div>
           </div>
 
@@ -135,206 +133,99 @@
 
 <!-- Add Goal Modal -->
 <div id="addGoalModal" class="fixed inset-0 bg-black/50 hidden z-50">
-  <div class="w-full h-full flex items-center justify-center p-4">
-    <div class="w-full max-w-md rounded-xl bg-white p-6">
-      <h2 class="text-xl font-bold text-[#2E2B41] text-center mb-5">Add New Goal</h2>
-      <label for="goalTitle" class="block text-sm font-medium text-[#2E2B41] mb-2">Goal Name</label>
-      <input id="goalTitle" type="text" placeholder="Enter your goal"
-             class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#E86C2A] mb-5">
-      <div class="flex justify-end gap-3">
-        <button id="cancelGoalBtn"
-                class="rounded-lg border border-[#E86C2A] bg-[#FFEDE3] text-[#A44311] px-5 py-2 hover:bg-[#ffdfcf]">
-          Cancel
-        </button>
-        <button id="saveGoalBtn"
-                class="rounded-lg bg-[#E86C2A] text-white px-5 py-2 hover:bg-[#dd6020]">
-          Add goal
-        </button>
-      </div>
-    </div>
-  </div>
 </div>
 
 <script>
+// Get CSRF token from the DOM
+function getCsrfToken() {
+  const token = document.querySelector('[name=csrfmiddlewaretoken]');
+  if (!token) {
+    console.error('CSRF token not found in DOM');
+    return null;
+  }
+  console.log('CSRF Token found:', token.value);
+  return token.value;
+}
+
+let selectedDate = null;
+
 document.addEventListener('DOMContentLoaded', () => {
-  let currentYear  = {{ year }};
-  let currentMonth = {{ month }};
-  let selectedDate = '{{ today }}';
-
-  // prev / next month
-  document.getElementById('prevMonth').addEventListener('click', () => {
-    if (currentMonth === 1) { currentMonth = 12; currentYear--; } else { currentMonth--; }
-    loadCalendar(currentYear, currentMonth);
-  });
-  document.getElementById('nextMonth').addEventListener('click', () => {
-    if (currentMonth === 12) { currentMonth = 1; currentYear++; } else { currentMonth++; }
-    loadCalendar(currentYear, currentMonth);
-  });
-
-  // day select
-  document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('calendar-day')) {
-      document.querySelectorAll('.calendar-day').forEach(d => {
-        d.classList.remove('bg-[#E86C2A]', 'text-white');
-        d.classList.add('text-[#2E2B41]', 'hover:bg-gray-100');
-      });
-      e.target.classList.add('bg-[#E86C2A]', 'text-white');
-      e.target.classList.remove('text-[#2E2B41]', 'hover:bg-gray-100');
-
-      selectedDate = e.target.dataset.date;
-      loadGoalsForDate(selectedDate);
-    }
-  });
-
-  // modal open/close
-  document.getElementById('addGoalBtn').addEventListener('click', () => {
-    document.getElementById('addGoalModal').classList.remove('hidden');
-    document.getElementById('goalTitle').focus();
-  });
-  document.getElementById('cancelGoalBtn').addEventListener('click', closeModal);
-  document.getElementById('addGoalModal').addEventListener('click', (e) => {
-    if (e.target.id === 'addGoalModal') closeModal();
-  });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-  function closeModal() {
-    document.getElementById('addGoalModal').classList.add('hidden');
-    document.getElementById('goalTitle').value = '';
+  // Verify CSRF token is available
+  const csrfToken = getCsrfToken();
+  if (!csrfToken) {
+    console.error('CSRF token is missing!');
   }
 
-  // save goal
-  document.getElementById('saveGoalBtn').addEventListener('click', () => {
-    const title = document.getElementById('goalTitle').value.trim();
-    if (!title) { alert('Please enter a goal title'); return; }
-
-     fetch('{% url "goals:add_goal" %}', {
-       method: 'POST',
-       headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
-       body: JSON.stringify({ title: title, date: selectedDate })
-     })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) { closeModal(); loadGoalsForDate(selectedDate); }
-      else { alert(data.error || 'Failed to add goal'); }
-    })
-    .catch(() => alert('Failed to add goal'));
+  // Calendar day click handler
+  document.querySelectorAll('.calendar-day').forEach(day => {
+    day.addEventListener('click', (e) => {
+      e.preventDefault();
+      selectedDate = e.target.getAttribute('data-date');
+      console.log('Selected date:', selectedDate);
+      document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+      e.target.classList.add('selected');
+    });
   });
 
-  // toggle complete
-  document.addEventListener('change', (e) => {
-    if (!e.target.classList.contains('goal-checkbox')) return;
-    const goalId = e.target.dataset.goalId;
-    const isCompleted = e.target.checked;
+  // Add Goal button click handler
+  document.getElementById('addGoalBtn')?.addEventListener('click', async () => {
+    const title = prompt('Enter goal title:');
+    if (!title || !title.trim()) return;
 
-    fetch(`{% url "goals:toggle_goal" 0 %}`.replace('0', goalId), {
-      method: 'POST',
-      headers: { 
-        'X-CSRFToken': getCsrfToken(),
-        'Accept': 'application/json'
+    if (!selectedDate) {
+      alert('Please select a date first');
+      return;
+    }
+
+    const csrfToken = getCsrfToken();
+    if (!csrfToken) {
+      alert('Security error: CSRF token missing');
+      return;
+    }
+
+    console.log('Sending request with CSRF token:', csrfToken);
+    console.log('Selected date:', selectedDate);
+    console.log('Title:', title.trim());
+
+    try {
+      const response = await fetch('{% url "goals:add_goal" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          title: title.trim(),
+          date: selectedDate
+        })
+      });
+
+      console.log('Response status:', response.status);
+
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response:', text);
+        alert('Server error: ' + text.substring(0, 200));
+        return;
       }
-    })
-    .then(r => r.json())
-    .then(data => {
+
+      const data = await response.json();
+      console.log('Response data:', data);
+      
       if (data.success) {
-        const title = e.target.nextElementSibling;
-        if (isCompleted) {
-          title.classList.add('line-through', 'text-gray-500');
-        } else {
-          title.classList.remove('line-through', 'text-gray-500');
-        }
+        alert('Goal added successfully!');
+        location.reload();
       } else {
-        e.target.checked = !isCompleted;
+        alert(data.error || 'Failed to add goal');
       }
-    })
-    .catch(() => { e.target.checked = !isCompleted; });
-  });
-
-  // data loaders
-  function loadCalendar(year, month) {
-    fetch(`{% url "goals:get_calendar_data" 0 0 %}`.replace('0/0', `${year}/${month}`))
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) { currentYear = year; currentMonth = month; updateCalendarDisplay(data.data); }
-      });
-  }
-
-  function updateCalendarDisplay(data) {
-    document.getElementById('monthYear').textContent = `${data.month_name} ${data.year}`;
-    const grid = document.getElementById('calendarGrid');
-    grid.innerHTML = '';
-
-    data.calendar.forEach(week => {
-      week.forEach(day => {
-        if (day === 0) {
-          grid.innerHTML += '<div class="h-10"></div>';
-        } else {
-          // FIX: correct date string (use data.month, not data.year twice)
-          const dateStr = `${data.year}-${String(data.month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-          const isSelected = dateStr === selectedDate;
-          const cls = isSelected ? 'bg-[#E86C2A] text-white' : 'text-[#2E2B41] hover:bg-gray-100';
-          grid.innerHTML += `
-            <button class="calendar-day h-12 text-sm rounded-md transition ${cls}"
-                    data-date="${dateStr}" data-day="${day}">
-              ${day}
-            </button>`;
-        }
-      });
-    });
-  }
-
-  function loadGoalsForDate(dateStr) {
-    const [y,m,d] = dateStr.split('-');
-    fetch(`{% url "goals:get_goals_for_date" 0 0 0 %}`.replace('0/0/0', `${y}/${m}/${d}`))
-      .then(r => r.json())
-      .then(data => { if (data.success) updateGoalsList(data.goals); });
-  }
-
-  function updateGoalsList(goals) {
-    const list = document.getElementById('goalsList');
-    list.innerHTML = '';
-    if (!goals.length) return;
-
-    goals.forEach(g => {
-      const row = document.createElement('div');
-      row.className = 'goal-item bg-[#EFEDE8] rounded-xl px-4 py-3 flex items-center';
-      row.style.width = '664px';
-      row.style.height = '61px';
-      
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.className = 'goal-checkbox w-5 h-5 rounded border-gray-300 text-[#3F3A59] focus:ring-[#3F3A59]';
-      checkbox.checked = g.is_completed || false;
-      checkbox.setAttribute('data-goal-id', g.id);
-      
-      const span = document.createElement('span');
-      span.className = `goal-title ml-3 text-[#2E2B41] text-[20px] ${g.is_completed ? 'line-through text-gray-500' : ''}`;
-      span.textContent = g.title;
-      
-      row.appendChild(checkbox);
-      row.appendChild(span);
-      list.appendChild(row);
-    });
-  }
-
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      document.cookie.split(';').forEach(c => {
-        const cookie = c.trim();
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        }
-      });
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to add goal: ' + error.message);
     }
-    return cookieValue;
-  }
-
-  function getCsrfToken() {
-    // Try to get CSRF token from hidden input
-    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
-    if (csrfInput) return csrfInput.value;
-    // Fallback to cookie
-    return getCookie('csrftoken');
-  }
+  });
 });
 </script>
 {% endblock %}

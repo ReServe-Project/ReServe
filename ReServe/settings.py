@@ -33,7 +33,7 @@ DEBUG = not PRODUCTION
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "khayru-rafa-reserve.pbp.cs.ui.ac.id"]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://khayru-rafa-reserve.pbp.cs.ui.ac.id"
+    "http://localhost:5173"
 ]
 # Application definition
 
@@ -137,17 +137,16 @@ AUTH_PASSWORD_VALIDATORS = [
 CORS_ALLOW_CREDENTIALS = True
 
 if DEBUG:
-    # Allow Flutter web dev server (random ports)
+    # Allow all localhost origins with any port
     CORS_ALLOWED_ORIGIN_REGEXES = [
-        r"^http:\/\/localhost:\d+$",
-        r"^http:\/\/127\.0\.0\.1:\d+$",
+        r"^https?://localhost(:\d+)?$",
+        r"^https?://127\.0\.0\.1(:\d+)?$",
     ]
 else:
-    # Production: usually no need to allow any browser origins,
-    # unless you host a separate frontend domain that calls this backend.
+    # Production: allow specific origins
     CORS_ALLOWED_ORIGINS = [
-        # Example (ONLY if needed):
         "https://khayru-rafa-reserve.pbp.cs.ui.ac.id",
+        "http://localhost:5173"
     ]
 
 # Internationalization
