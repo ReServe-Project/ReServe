@@ -75,3 +75,22 @@ def get_reviews_fragment(request, pk):
     class_item.average_rating = round(avg_rating, 1)
 
     return render(request, "_reviews_list.html", {"c": class_item})
+
+from django.http import JsonResponse
+from .models import Review
+
+def reviews_json(request, pk):
+    reviews = Review.objects.filter(class_item_id=pk).select_related("user")
+
+    data = [
+        {
+            "id": r.id,
+            "user": r.user.username,
+            "rating": r.rating,
+            "comment": r.comment,
+            "created_at": r.created_at.isoformat(),
+        }
+        for r in reviews
+    ]
+
+    return JsonResponse(data, safe=False)
