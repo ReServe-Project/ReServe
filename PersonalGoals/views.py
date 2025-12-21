@@ -4,7 +4,7 @@ import calendar
 from datetime import datetime, date
 from collections import defaultdict
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
 import json
 from .models import PersonalGoal
@@ -87,48 +87,56 @@ def calendar_month(request, year, month):
     
     return render(request, 'PersonalGoals.html', context)
 
-def add_goal(request):
-    if request.method != "POST":
-        return HttpResponseBadRequest("POST only.")
-    
-    # Handle both form data and JSON
-    if request.content_type == 'application/json':
-        data = json.loads(request.body)
-        title = (data.get("title") or "").strip()
-        date_str = data.get("date") or ""
-    else:
-        title = (request.POST.get("title") or "").strip()
-        date_str = request.POST.get("date") or ""
-    
-    if not title or not date_str:
-        if request.content_type == 'application/json':
-            return JsonResponse({"error": "Title and date are required.", "success": False}, status=400)
-        return HttpResponseBadRequest("Title and date are required.")
-    
-    try:
-        d = datetime.strptime(date_str, "%Y-%m-%d").date()
-    except ValueError:
-        if request.content_type == 'application/json':
-            return JsonResponse({"error": "Invalid date format.", "success": False}, status=400)
-        return HttpResponseBadRequest("Invalid date format.")
-    
-    goal = PersonalGoal.objects.create(user=request.user, title=title, date=d)
-    
-    if request.content_type == 'application/json':
-        return JsonResponse({
-            "success": True,
-            "goal": {
-                "id": goal.id,
-                "title": goal.title,
-                "date": goal.date.isoformat(),
-                "is_completed": goal.is_completed
-            }
-        })
-    
-    return redirect("goals:calendar_month", year=d.year, month=d.month)
-
+@login_required()
+@csrf_exempt
 @require_POST
-def toggle_goal(request, goal_id:int):
+def add_goal(request):
+    # Handle both form data and JSON
+    try:
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+            title = (data.get("title") or "").strip()
+            date_str = data.get("date") or ""
+        else:
+            title = (request.POST.get("title") or "").strip()
+            date_str = request.POST.get("date") or ""
+        
+        if not title or not date_str:
+            if request.content_type == 'application/json':
+                return JsonResponse({"error": "Title and date are required.", "success": False}, status=400)
+            return HttpResponseBadRequest("Title and date are required.")
+        
+        try:
+            d = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            if request.content_type == 'application/json':
+                return JsonResponse({"error": "Invalid date format.", "success": False}, status=400)
+            return HttpResponseBadRequest("Invalid date format.")
+        
+        goal = PersonalGoal.objects.create(user=request.user, title=title, date=d)
+        
+        if request.content_type == 'application/json':
+            return JsonResponse({
+                "success": True,
+                "goal": {
+                    "id": goal.id,
+                    "title": goal.title,
+                    "date": goal.date.isoformat(),
+                    "is_completed": goal.is_completed
+                }
+            })
+        
+        return redirect("goals:calendar_month", year=d.year, month=d.month)
+    
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON.", "success": False}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e), "success": False}, status=500)
+
+@login_required()
+@csrf_exempt
+@require_POST
+def toggle_goal(request, goal_id: int):
     goal = get_object_or_404(PersonalGoal, id=goal_id, user=request.user)
     goal.is_completed = not goal.is_completed
     goal.save()
@@ -146,6 +154,8 @@ def toggle_goal(request, goal_id:int):
     
     return redirect("goals:calendar_month", year=goal.date.year, month=goal.date.month)
 
+@login_required()
+@csrf_exempt
 @require_POST
 def delete_goal(request, goal_id):
     try:
@@ -155,6 +165,7 @@ def delete_goal(request, goal_id):
     except PersonalGoal.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Goal not found'})
 
+@login_required()
 def get_goals_for_date(request, year: int, month: int, day: int):
     """Get goals for a specific date via AJAX"""
     try:
@@ -179,6 +190,7 @@ def get_goals_for_date(request, year: int, month: int, day: int):
         "goals": goals_data
     })
 
+@login_required()
 def get_calendar_data(request, year, month):
     user = request.user
     # Get the calendar data
