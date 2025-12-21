@@ -7,8 +7,15 @@ from django.core import serializers
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import csrf_exempt
 import json
+
+import ipaddress
+import socket
+from urllib.parse import urlparse
+
+import requests
 
 def main_blog(request):
     filter_type = request.GET.get('filter', 'all') 
@@ -225,3 +232,89 @@ def api_user_blogs(request):
     blogs = Blog.objects.filter(user=request.user).order_by('-created_at')
     blog_list = [_blog_to_dict(blog) for blog in blogs]
     return JsonResponse(blog_list, safe=False)
+
+
+def _is_public_address(hostname: str) -> bool:
+    """Basic SSRF mitigation: block private/loopback/etc destinations."""
+    try:
+        infos = socket.getaddrinfo(hostname, None)
+    except socket.gaierror:
+        return False
+
+    for info in infos:
+        ip_str = info[4][0]
+        try:
+            ip = ipaddress.ip_address(ip_str)
+        except ValueError:
+            return False
+
+        if (
+            ip.is_private
+            or ip.is_loopback
+            or ip.is_link_local
+            or ip.is_multicast
+            or ip.is_reserved
+            or ip.is_unspecified
+        ):
+            return False
+
+    return True
+
+
+@require_GET
+def proxy_image(request):
+    """Proxy an external image.
+
+    Use this when the mobile client cannot load third-party images directly.
+    Security: accepts only http/https + blocks private/loopback IP ranges.
+    """
+
+    image_url = request.GET.get('url')
+    if not image_url:
+        return HttpResponse('No URL provided', status=400)
+
+    image_url = image_url.strip()
+    parsed = urlparse(image_url)
+
+    if parsed.scheme not in ('http', 'https'):
+        return HttpResponse('Invalid URL scheme', status=400)
+
+    if not parsed.hostname:
+        return HttpResponse('Invalid URL', status=400)
+
+    if parsed.hostname in {'localhost', '127.0.0.1', '::1'}:
+        return HttpResponse('Blocked host', status=400)
+
+    if not _is_public_address(parsed.hostname):
+        return HttpResponse('Blocked host', status=400)
+
+    max_bytes = 5 * 1024 * 1024  # 5MB
+    try:
+        resp = requests.get(
+            image_url,
+            timeout=10,
+            stream=True,
+            headers={
+                'User-Agent': 'ReServeImageProxy/1.0',
+                'Accept': 'image/*,*/*;q=0.8',
+            },
+        )
+        resp.raise_for_status()
+
+        content_type = resp.headers.get('Content-Type', 'image/jpeg')
+        if not content_type.lower().startswith('image/'):
+            return HttpResponse('URL did not return an image', status=400)
+
+        data = bytearray()
+        for chunk in resp.iter_content(chunk_size=64 * 1024):
+            if not chunk:
+                continue
+            data.extend(chunk)
+            if len(data) > max_bytes:
+                return HttpResponse('Image too large', status=413)
+
+        out = HttpResponse(bytes(data), content_type=content_type)
+        out['Cache-Control'] = 'public, max-age=600'
+        return out
+    except requests.RequestException as e:
+        return HttpResponse(f'Error fetching image: {str(e)}', status=502)
