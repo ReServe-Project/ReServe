@@ -254,6 +254,16 @@ def api_login(request: HttpRequest) -> JsonResponse:
         }, status=401)
 
     auth_login(request, user)
+    
+    # DEBUG: Log session creation
+    import sys
+    print(f"\n=== DEBUG api_login SUCCESS ===", file=sys.stderr)
+    print(f"User: {user.username}", file=sys.stderr)
+    print(f"Session key: {request.session.session_key}", file=sys.stderr)
+    print(f"request.user: {request.user}", file=sys.stderr)
+    print(f"SESSION_COOKIE_NAME: {request.session.session_key}", file=sys.stderr)
+    print(f"=== END DEBUG ===\n", file=sys.stderr)
+    
     return JsonResponse({
         "status": True,
         "success": True,

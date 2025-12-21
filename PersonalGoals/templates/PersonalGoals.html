@@ -206,17 +206,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const title = document.getElementById('goalTitle').value.trim();
     if (!title) { alert('Please enter a goal title'); return; }
 
-     fetch('{% url "goals:add_goal" %}', {
-       method: 'POST',
-       headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
-       body: JSON.stringify({ title: title, date: selectedDate })
-     })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) { closeModal(); loadGoalsForDate(selectedDate); }
-      else { alert(data.error || 'Failed to add goal'); }
+    fetch('{% url "goals:add_goal" %}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+      body: JSON.stringify({ title: title, date: selectedDate })
     })
-    .catch(() => alert('Failed to add goal'));
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) { closeModal(); loadGoalsForDate(selectedDate); }
+        else { alert(data.error || 'Failed to add goal'); }
+      })
+      .catch(() => alert('Failed to add goal'));
   });
 
   // toggle complete
@@ -232,20 +232,20 @@ document.addEventListener('DOMContentLoaded', () => {
         'Accept': 'application/json'
       }
     })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        const title = e.target.nextElementSibling;
-        if (isCompleted) {
-          title.classList.add('line-through', 'text-gray-500');
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          const title = e.target.nextElementSibling;
+          if (isCompleted) {
+            title.classList.add('line-through', 'text-gray-500');
+          } else {
+            title.classList.remove('line-through', 'text-gray-500');
+          }
         } else {
-          title.classList.remove('line-through', 'text-gray-500');
+          e.target.checked = !isCompleted;
         }
-      } else {
-        e.target.checked = !isCompleted;
-      }
-    })
-    .catch(() => { e.target.checked = !isCompleted; });
+      })
+      .catch(() => { e.target.checked = !isCompleted; });
   });
 
   // data loaders
@@ -267,7 +267,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (day === 0) {
           grid.innerHTML += '<div class="h-10"></div>';
         } else {
-          // FIX: correct date string (use data.month, not data.year twice)
           const dateStr = `${data.year}-${String(data.month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
           const isSelected = dateStr === selectedDate;
           const cls = isSelected ? 'bg-[#E86C2A] text-white' : 'text-[#2E2B41] hover:bg-gray-100';
@@ -315,25 +314,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function getCookie(name) {
+  function getCsrfToken() {
+    // Try multiple methods to get CSRF token
+    
+    // Method 1: From hidden input in template
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfInput) return csrfInput.value;
+    
+    // Method 2: From cookie
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
       document.cookie.split(';').forEach(c => {
         const cookie = c.trim();
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        if (cookie.substring(0, 10) === 'csrftoken=') {
+          cookieValue = decodeURIComponent(cookie.substring(10));
         }
       });
     }
-    return cookieValue;
-  }
-
-  function getCsrfToken() {
-    // Try to get CSRF token from hidden input
-    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
-    if (csrfInput) return csrfInput.value;
-    // Fallback to cookie
-    return getCookie('csrftoken');
+    return cookieValue || '';
   }
 });
 </script>
