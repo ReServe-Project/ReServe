@@ -4,4 +4,10 @@ whitenoise
 psycopg2-binary
 requests
 urllib3
+<<<<<<< Updated upstream
 python-dotenv
+=======
+python-dotenv
+pillow
+django-cors-headers
+>>>>>>> Stashed changes
