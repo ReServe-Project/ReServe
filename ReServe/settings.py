@@ -33,9 +33,17 @@ DEBUG = not PRODUCTION
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "khayru-rafa-reserve.pbp.cs.ui.ac.id"]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://khayru-rafa-reserve.pbp.cs.ui.ac.id"
+    "https://khayru-rafa-reserve.pbp.cs.ui.ac.id",
 ]
-# Application definition
+
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS += [
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "http://localhost:52173",  # <-- add your flutter web port here
+        "http://localhost:52680",  # <-- add your flutter web port here
+    ]
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -65,6 +73,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+
 ]
 
 ROOT_URLCONF = 'ReServe.urls'
