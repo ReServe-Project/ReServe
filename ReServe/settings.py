@@ -192,12 +192,7 @@ LOGOUT_REDIRECT_URL = "login"
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / "staticfiles"  # or os.path.join(BASE_DIR, "staticfiles")
-
-# STATICFILES_DIRS — source/static locations you edit during development
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  # do NOT include STATIC_ROOT here
-]
+STATIC_ROOT = BASE_DIR / "static"  # or os.path.join(BASE_DIR, "staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
