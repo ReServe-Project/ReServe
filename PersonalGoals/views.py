@@ -91,31 +91,44 @@ def calendar_month(request, year, month):
 @csrf_exempt
 @require_POST
 def add_goal(request):
-    # Handle both form data and JSON
+    # Handle both form data and JSON - ALWAYS return JSON for API requests
     try:
+        # Try to parse JSON first
         if request.content_type == 'application/json':
             data = json.loads(request.body)
             title = (data.get("title") or "").strip()
             date_str = data.get("date") or ""
         else:
+            # For form data (what Flutter sends)
             title = (request.POST.get("title") or "").strip()
             date_str = request.POST.get("date") or ""
         
+        # Check if it's an API request (Flutter, mobile, or AJAX)
+        is_api_request = (
+            request.headers.get('X-Requested-With') == 'XMLHttpRequest' or
+            request.content_type == 'application/json' or
+            request.headers.get('Accept', '').startswith('application/json') or
+            'flutter' in request.headers.get('User-Agent', '').lower()
+        )
+        
         if not title or not date_str:
-            if request.content_type == 'application/json':
-                return JsonResponse({"error": "Title and date are required.", "success": False}, status=400)
-            return HttpResponseBadRequest("Title and date are required.")
+            error_msg = "Title and date are required."
+            if is_api_request:
+                return JsonResponse({"error": error_msg, "success": False}, status=400)
+            return HttpResponseBadRequest(error_msg)
         
         try:
             d = datetime.strptime(date_str, "%Y-%m-%d").date()
         except ValueError:
-            if request.content_type == 'application/json':
-                return JsonResponse({"error": "Invalid date format.", "success": False}, status=400)
-            return HttpResponseBadRequest("Invalid date format.")
+            error_msg = "Invalid date format."
+            if is_api_request:
+                return JsonResponse({"error": error_msg, "success": False}, status=400)
+            return HttpResponseBadRequest(error_msg)
         
         goal = PersonalGoal.objects.create(user=request.user, title=title, date=d)
         
-        if request.content_type == 'application/json':
+        # ALWAYS return JSON for API requests
+        if is_api_request:
             return JsonResponse({
                 "success": True,
                 "goal": {
@@ -126,6 +139,7 @@ def add_goal(request):
                 }
             })
         
+        # Only redirect for web form submissions
         return redirect("goals:calendar_month", year=d.year, month=d.month)
     
     except json.JSONDecodeError:
