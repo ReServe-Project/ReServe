@@ -42,6 +42,7 @@ if DEBUG:
         "http://127.0.0.1:8000",
         "http://localhost:52173",  # <-- add your flutter web port here
         "http://localhost:52680",  # <-- add your flutter web port here
+        "http://localhost:56769",
     ]
 
 
