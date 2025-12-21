@@ -12,5 +12,6 @@ urlpatterns = [
     # --- ADD THIS NEW PATH ---
     path('edit/<int:booking_id>/', views.edit_booking_view, name='edit_booking'), 
     path('api/history/', views.booking_history_api),
-
+    path('api/delete/<int:booking_id>/', views.delete_booking_api),
+    
 ]

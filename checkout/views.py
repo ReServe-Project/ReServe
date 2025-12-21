@@ -83,6 +83,18 @@ def delete_booking(request, booking_id):
     messages.success(request, 'Booking has been successfully deleted.')
     return redirect('checkout:booking_history')
 
+@require_POST
+@login_required
+def delete_booking_api(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    booking.delete()
+
+    return JsonResponse({
+        "success": True,
+        "message": "Booking deleted successfully"
+    })
+
+
 
 @login_required
 def edit_booking_view(request, booking_id):
