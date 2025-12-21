@@ -146,10 +146,14 @@ AUTH_PASSWORD_VALIDATORS = [
 CORS_ALLOW_CREDENTIALS = True
 
 if DEBUG:
-    # Allow Flutter web dev server (random ports)
+    # Allow all origins for local development (Flutter uses dynamic ports)
+    CORS_ALLOW_ALL_ORIGINS = True
+    
+    # Explicitly allow regex patterns for localhost and 127.0.0.1
     CORS_ALLOWED_ORIGIN_REGEXES = [
         r"^http:\/\/localhost:\d+$",
         r"^http:\/\/127\.0\.0\.1:\d+$",
+        r"^http:\/\/[:0-9a-fA-F]+$",  # IPv6
     ]
 else:
     # Production: usually no need to allow any browser origins,
@@ -158,6 +162,14 @@ else:
         # Example (ONLY if needed):
         "https://khayru-rafa-reserve.pbp.cs.ui.ac.id",
     ]
+
+# Session and Authentication Configuration
+SESSION_COOKIE_HTTPONLY = False  # Allow client to access session cookie
+SESSION_COOKIE_SAMESITE = None  # Allow credentials in cross-origin requests
+SESSION_COOKIE_SECURE = False  # Allow over HTTP in development
+CSRF_COOKIE_HTTPONLY = False  # Allow client to read CSRF token
+CSRF_COOKIE_SAMESITE = None  # Allow credentials in cross-origin requests
+CSRF_COOKIE_SECURE = False  # Allow over HTTP in development
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
